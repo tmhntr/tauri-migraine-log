@@ -1,45 +1,15 @@
 import { Outlet } from "react-router-dom";
 import {
-  ChevronLeft,
-  ChevronRight,
-  Copy,
-  CreditCard,
-  File,
   Home,
   LineChart,
-  ListFilter,
-  MoreVertical,
-  Package,
-  Package2,
   PanelLeft,
   Search,
   Settings,
-  ShoppingCart,
-  Truck,
-  Users2,
   PlusIcon,
 } from "lucide-react";
-
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
@@ -54,11 +24,48 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useState } from "react";
 
-export const description =
-  "An orders dashboard with a sidebar navigation. The sidebar has icon navigation. The content area has a breadcrumb and search in the header. The main area has a list of recent orders with a filter and export button. The main area also has a detailed view of a single order with order details, shipping information, billing information, customer information, and payment information.";
+// export const description =
+//   "An orders dashboard with a sidebar navigation. The sidebar has icon navigation. The content area has a breadcrumb and search in the header. The main area has a list of recent orders with a filter and export button. The main area also has a detailed view of a single order with order details, shipping information, billing information, customer information, and payment information.";
+
+type EntryData = {
+  startTime: Date,
+  endTime?: Date,
+  recentSleep?: number,
+  severity?: "mild" | "moderate" | "severe" | "extreme",
+  recentHydration?: number,
+  maxTemp?: number,
+  minTemp?: number,
+  weather?: "clear" | "cloudy" | "overcast" | "raining" | "storm" | "snowing",
+  symptoms?: {
+    throbbing: boolean,
+    burning: boolean,
+    dullAche: boolean,
+    knifeLike: boolean,
+    nausea: boolean,
+    lightSensitivity: boolean,
+    pressure: boolean,
+    aura: boolean,
+    tightBand: boolean,
+    nechAche: boolean
+  },
+  warningSigns?: string,
+  onsetFactors?: string,
+  releifFactors?: string
+}
+
 
 export default function Dashboard() {
+
+  const [entries, setEntries] = useState<EntryData[]>()
+  // setEntries([])
+  // const addEntry
+
+
+
+
+
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-14 flex-col border-r bg-background sm:flex">
@@ -155,13 +162,13 @@ export default function Dashboard() {
                   href="/settings"
                   className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
                 >
-                  <LineChart className="h-5 w-5" />
+                  <Settings className="h-5 w-5" />
                   Settings
                 </a>
               </nav>
             </SheetContent>
           </Sheet>
-          <Breadcrumb className="hidden md:flex">
+          {/* <Breadcrumb className="hidden md:flex">
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbLink asChild>
@@ -179,8 +186,8 @@ export default function Dashboard() {
                 <BreadcrumbPage>Recent Orders</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
-          </Breadcrumb>
-          <div className="relative ml-auto flex-1 md:grow-0">
+          </Breadcrumb> */}
+          <div className="relative ml-auto flex-1 md:grow-0 hidden sm:flex">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
@@ -193,7 +200,7 @@ export default function Dashboard() {
               <Button
                 variant="outline"
                 size="icon"
-                className="overflow-hidden rounded-full"
+                className="overflow-hidden rounded-full hidden sm:flex"
               >
                 <img
                   src="/placeholder-user.jpg"

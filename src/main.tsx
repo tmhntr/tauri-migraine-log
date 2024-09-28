@@ -5,18 +5,22 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import Root from "./routes/root";
+import ErrorPage from "./error-page";
+
 // import App from "./App";
 import "./index.css"
 import Create from "./routes/Create";
 import Home from "./routes/Home";
 import Edit from "./routes/Edit";
 import View from "./routes/View";
+import Settings from "./routes/Settings";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Root />,
-    children: [
+    errorElement: <ErrorPage />,
+     children: [
       {
         index: true,
         element: <Home />
@@ -32,6 +36,10 @@ const router = createBrowserRouter([
       {
         path: "view",
         element: <View />
+      },
+      {
+        path: "settings",
+        element: <Settings />
       }
     ]
   },
@@ -39,6 +47,6 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <RouterProvider router={router} fallbackElement={<Root />} />
   </React.StrictMode>,
 );
