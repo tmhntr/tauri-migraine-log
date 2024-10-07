@@ -24,47 +24,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useState } from "react";
 
 // export const description =
 //   "An orders dashboard with a sidebar navigation. The sidebar has icon navigation. The content area has a breadcrumb and search in the header. The main area has a list of recent orders with a filter and export button. The main area also has a detailed view of a single order with order details, shipping information, billing information, customer information, and payment information.";
 
-type EntryData = {
-  startTime: Date,
-  endTime?: Date,
-  recentSleep?: number,
-  severity?: "mild" | "moderate" | "severe" | "extreme",
-  recentHydration?: number,
-  maxTemp?: number,
-  minTemp?: number,
-  weather?: "clear" | "cloudy" | "overcast" | "raining" | "storm" | "snowing",
-  symptoms?: {
-    throbbing: boolean,
-    burning: boolean,
-    dullAche: boolean,
-    knifeLike: boolean,
-    nausea: boolean,
-    lightSensitivity: boolean,
-    pressure: boolean,
-    aura: boolean,
-    tightBand: boolean,
-    nechAche: boolean
-  },
-  warningSigns?: string,
-  onsetFactors?: string,
-  releifFactors?: string
-}
-
 
 export default function Dashboard() {
-
-  const [entries, setEntries] = useState<EntryData[]>()
-  // setEntries([])
-  // const addEntry
-
-
-
-
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
@@ -221,7 +186,7 @@ export default function Dashboard() {
             </DropdownMenuContent>
           </DropdownMenu>
         </header>
-        <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 lg:grid-cols-3 xl:grid-cols-3">
+        <main className="flex-1">
           <Outlet />
         </main>
       </div>
