@@ -13,7 +13,9 @@ fn main() {
             version: 1,
             description: "create_initial_tables",
             sql: 
-            "CREATE TABLE entries (
+            "
+            DROP TABLE IF EXISTS entries;
+            CREATE TABLE IF NOT EXISTS entries (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 episode_date DATE DEFAULT NULL,
                 estimated_onset_time TIME DEFAULT NULL,
@@ -61,7 +63,7 @@ fn main() {
 
             Ok(())
         })
-        .plugin(tauri_plugin_sql::Builder::default().add_migrations("sqlite:database.sqlite", migrations).build())
+        .plugin(tauri_plugin_sql::Builder::default().add_migrations(&("sqlite:".to_owned() + &db::get_db_path()), migrations).build())
         .plugin(tauri_plugin_shell::init())
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
