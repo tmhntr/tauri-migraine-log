@@ -1,13 +1,12 @@
-
-import { useEffect, useState } from "react"
-import { columns } from "@/components/data-table/components/columns"
-import { DataTable } from "@/components/data-table/components/data-table"
-import { UserNav } from "@/components/data-table/components/user-nav"
+import { useEffect, useState } from 'react'
+import { columns } from '@/components/data-table/components/columns'
+import { DataTable } from '@/components/data-table/components/data-table'
+import { UserNav } from '@/components/data-table/components/user-nav'
 // import { taskSchema } from "./data/schema"
-import { getEntries } from "@/db"
+import { getEntries } from '@/db'
 
-import { Entry } from "@/components/data-table/data/schema"
-import { ColumnDef } from "@tanstack/react-table"
+import { Entry } from '@/components/data-table/data/schema'
+import { ColumnDef } from '@tanstack/react-table'
 
 // Simulate a database read for tasks.
 // async function getTasks() {
@@ -20,11 +19,11 @@ import { ColumnDef } from "@tanstack/react-table"
 //   return z.array(taskSchema).parse(tasks)
 // }
 
-export default function DataTablePage() {
+function DataTablePage() {
   const [entries, setEntries] = useState<Entry[]>([])
 
   const loadEntries = async () => {
-    const res = await getEntries() as Entry[]
+    const res = (await getEntries()) as Entry[]
     console.log(res)
     setEntries(res)
   }
@@ -35,9 +34,7 @@ export default function DataTablePage() {
 
   return (
     <>
-      <div className="">
-        
-      </div>
+      <div className=""></div>
       <div className="h-full flex-1 flex-col space-y-8 p-8 md:flex">
         <div className="flex items-center justify-between space-y-2">
           <div>
@@ -55,3 +52,9 @@ export default function DataTablePage() {
     </>
   )
 }
+
+import { createFileRoute } from '@tanstack/react-router'
+
+export const Route = createFileRoute('/entries/')({
+  component: DataTablePage,
+})

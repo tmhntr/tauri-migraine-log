@@ -14,4 +14,9 @@ const Create = () => {
   )
 }
 
-export default Create
+
+import { createFileRoute } from '@tanstack/react-router'
+
+export const Route = createFileRoute('/create')({
+  component: Create,
+})

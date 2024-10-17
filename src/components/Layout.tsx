@@ -24,12 +24,17 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { ReactNode } from "react";
+import { Link } from "@tanstack/react-router";
 
 // export const description =
 //   "An orders dashboard with a sidebar navigation. The sidebar has icon navigation. The content area has a breadcrumb and search in the header. The main area has a list of recent orders with a filter and export button. The main area also has a detailed view of a single order with order details, shipping information, billing information, customer information, and payment information.";
 
+type Props = {
+  children: ReactNode
+}
 
-export default function Dashboard() {
+const Layout = ({children} : Props) => {
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
@@ -38,37 +43,37 @@ export default function Dashboard() {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <a
-                  href="/Create"
+                <Link
+                  to="/create"
                   className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base"
                 >
                   <PlusIcon className="h-4 w-4 transition-all group-hover:scale-110" />
                   <span className="sr-only">Create entry</span>
-                </a>
+                </Link>
               </TooltipTrigger>
               <TooltipContent side="right">Create entry</TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
-                <a
-                  href="/"
+                <Link
+                  to="/"
                   className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                 >
                   <Home className="h-5 w-5" />
                   <span className="sr-only">Home</span>
-                </a>
+                </Link>
               </TooltipTrigger>
               <TooltipContent side="right">Home</TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
-                <a
-                  href="/view"
+                <Link
+                  to="/entries"
                   className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                 >
                   <LineChart className="h-5 w-5" />
                   <span className="sr-only">Analytics</span>
-                </a>
+                </Link>
               </TooltipTrigger>
               <TooltipContent side="right">Analytics</TooltipContent>
             </Tooltip>
@@ -78,13 +83,13 @@ export default function Dashboard() {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <a
-                  href="/settings"
+                <Link
+                  to="/settings"
                   className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                 >
                   <Settings className="h-5 w-5" />
                   <span className="sr-only">Settings</span>
-                </a>
+                </Link>
               </TooltipTrigger>
               <TooltipContent side="right">Settings</TooltipContent>
             </Tooltip>
@@ -102,34 +107,34 @@ export default function Dashboard() {
             </SheetTrigger>
             <SheetContent side="left" className="sm:max-w-xs">
               <nav className="grid gap-6 text-lg font-medium">
-                <a
-                  href="/create"
+                <Link
+                  to="/create"
                   className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
                 >
                   <PlusIcon className="h-5 w-5 transition-all group-hover:scale-110" />
                   <span className="sr-only">Create Entry</span>
-                </a>
-                <a
-                  href="/"
+                </Link>
+                <Link
+                  to="/"
                   className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
                 >
                   <Home className="h-5 w-5" />
                   Home
-                </a>
-                <a
-                  href="/view"
+                </Link>
+                <Link
+                  to="/entries"
                   className="flex items-center gap-4 px-2.5 text-foreground"
                 >
                   <LineChart className="h-5 w-5" />
                   Entries
-                </a>
-                <a
-                  href="/settings"
+                </Link>
+                <Link
+                  to="/settings"
                   className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
                 >
                   <Settings className="h-5 w-5" />
                   Settings
-                </a>
+                </Link>
               </nav>
             </SheetContent>
           </Sheet>
@@ -187,9 +192,11 @@ export default function Dashboard() {
           </DropdownMenu>
         </header>
         <main className="flex-1">
-          <Outlet />
+          {children}
         </main>
       </div>
     </div>
   );
 }
+
+export default Layout;
