@@ -1,17 +1,12 @@
 // { name: 'Factors', fields: ['factors_brought_on', 'factors_relieve'] },
 
 import React from 'react';
-import { Entry } from '../../types';
+import { EntryType } from '@/schema';
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Button } from "@/components/ui/button"
-import { CalendarIcon } from "@radix-ui/react-icons"
-import { format } from "date-fns"
 
 interface BasicInfoProps {
-  formData: Partial<Entry>;
+  formData: Partial<EntryType>;
   handleInputChange: (name: string, value: string | boolean) => void;
 }
 

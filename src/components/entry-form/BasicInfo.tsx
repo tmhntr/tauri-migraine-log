@@ -1,5 +1,4 @@
 import React from 'react';
-import { Entry } from '../../types';
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Calendar } from "@/components/ui/calendar"
@@ -7,9 +6,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button"
 import { CalendarIcon } from "@radix-ui/react-icons"
 import { format } from "date-fns"
+import { EntryType } from '@/schema';
 
 interface BasicInfoProps {
-  formData: Partial<Entry>;
+  formData: Partial<EntryType>;
   handleInputChange: (name: string, value: string | boolean) => void;
 }
 

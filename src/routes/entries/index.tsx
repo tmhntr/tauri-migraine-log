@@ -1,36 +1,13 @@
-import { useEffect, useState } from 'react'
-import { columns } from '@/components/data-table/components/columns'
-import { DataTable } from '@/components/data-table/components/data-table'
-import { UserNav } from '@/components/data-table/components/user-nav'
-// import { taskSchema } from "./data/schema"
-import { getEntries } from '@/db'
-
-import { Entry } from '@/components/data-table/data/schema'
-import { ColumnDef } from '@tanstack/react-table'
-
-// Simulate a database read for tasks.
-// async function getTasks() {
-//   const data = await fs.readFile(
-//     path.join(process.cwd(), "app/(app)/examples/tasks/data/tasks.json")
-//   )
-
-//   const tasks = JSON.parse(data.toString())
-
-//   return z.array(taskSchema).parse(tasks)
-// }
+import { getEntries } from "@/db";
+import { DataTable } from "@/components/entry-table";
 
 function DataTablePage() {
-  const [entries, setEntries] = useState<Entry[]>([])
+  const { data, error, isLoading } = useQuery({
+    queryKey: ["entries"],
+    queryFn: getEntries,
+  });
 
-  const loadEntries = async () => {
-    const res = (await getEntries()) as Entry[]
-    console.log(res)
-    setEntries(res)
-  }
-
-  useEffect(() => {
-    loadEntries()
-  }, [])
+  if (error) return <Navigate />;
 
   return (
     <>
@@ -43,18 +20,24 @@ function DataTablePage() {
               Here&apos;s a list of your entries!
             </p>
           </div>
-          <div className="flex items-center space-x-2">
-            <UserNav />
-          </div>
+        </div>{" "}
+        <div className="flex flex-col">
+          {isLoading ? (
+            <Loader />
+          ) : (
+            <DataTable data={data ?? []} columns={columns} />
+          )}
         </div>
-        <DataTable data={entries} columns={columns as ColumnDef<Entry>[]} />
       </div>
     </>
-  )
+  );
 }
 
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Navigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { Loader } from "lucide-react";
+import { columns } from "@/components/entry-table/columns";
 
-export const Route = createFileRoute('/entries/')({
+export const Route = createFileRoute("/entries/")({
   component: DataTablePage,
-})
+});

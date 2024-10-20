@@ -1,13 +1,11 @@
 import React from 'react';
-import { Entry } from '../../types';
+import { EntryType } from '@/schema';
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-// { name: 'Other Details', fields: ['weather', 'temperature_high', 'temperature_low', 'hydration_oz', 'recent_duration_of_sleep', 'total_hours_of_migraine'] },
-
 
 interface BasicInfoProps {
-  formData: Partial<Entry>;
+  formData: Partial<EntryType>;
   handleInputChange: (name: string, value: string | boolean) => void;
 }
 

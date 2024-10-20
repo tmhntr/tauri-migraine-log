@@ -16,6 +16,7 @@ import { Route as EditImport } from './routes/edit'
 import { Route as CreateImport } from './routes/create'
 import { Route as IndexImport } from './routes/index'
 import { Route as EntriesIndexImport } from './routes/entries/index'
+import { Route as EntriesEntryIdImport } from './routes/entries/$entryId'
 
 // Create/Update Routes
 
@@ -41,6 +42,11 @@ const IndexRoute = IndexImport.update({
 
 const EntriesIndexRoute = EntriesIndexImport.update({
   path: '/entries/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const EntriesEntryIdRoute = EntriesEntryIdImport.update({
+  path: '/entries/$entryId',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -76,6 +82,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsImport
       parentRoute: typeof rootRoute
     }
+    '/entries/$entryId': {
+      id: '/entries/$entryId'
+      path: '/entries/$entryId'
+      fullPath: '/entries/$entryId'
+      preLoaderRoute: typeof EntriesEntryIdImport
+      parentRoute: typeof rootRoute
+    }
     '/entries/': {
       id: '/entries/'
       path: '/entries'
@@ -93,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/create': typeof CreateRoute
   '/edit': typeof EditRoute
   '/settings': typeof SettingsRoute
+  '/entries/$entryId': typeof EntriesEntryIdRoute
   '/entries': typeof EntriesIndexRoute
 }
 
@@ -101,6 +115,7 @@ export interface FileRoutesByTo {
   '/create': typeof CreateRoute
   '/edit': typeof EditRoute
   '/settings': typeof SettingsRoute
+  '/entries/$entryId': typeof EntriesEntryIdRoute
   '/entries': typeof EntriesIndexRoute
 }
 
@@ -110,15 +125,29 @@ export interface FileRoutesById {
   '/create': typeof CreateRoute
   '/edit': typeof EditRoute
   '/settings': typeof SettingsRoute
+  '/entries/$entryId': typeof EntriesEntryIdRoute
   '/entries/': typeof EntriesIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/create' | '/edit' | '/settings' | '/entries'
+  fullPaths:
+    | '/'
+    | '/create'
+    | '/edit'
+    | '/settings'
+    | '/entries/$entryId'
+    | '/entries'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/create' | '/edit' | '/settings' | '/entries'
-  id: '__root__' | '/' | '/create' | '/edit' | '/settings' | '/entries/'
+  to: '/' | '/create' | '/edit' | '/settings' | '/entries/$entryId' | '/entries'
+  id:
+    | '__root__'
+    | '/'
+    | '/create'
+    | '/edit'
+    | '/settings'
+    | '/entries/$entryId'
+    | '/entries/'
   fileRoutesById: FileRoutesById
 }
 
@@ -127,6 +156,7 @@ export interface RootRouteChildren {
   CreateRoute: typeof CreateRoute
   EditRoute: typeof EditRoute
   SettingsRoute: typeof SettingsRoute
+  EntriesEntryIdRoute: typeof EntriesEntryIdRoute
   EntriesIndexRoute: typeof EntriesIndexRoute
 }
 
@@ -135,6 +165,7 @@ const rootRouteChildren: RootRouteChildren = {
   CreateRoute: CreateRoute,
   EditRoute: EditRoute,
   SettingsRoute: SettingsRoute,
+  EntriesEntryIdRoute: EntriesEntryIdRoute,
   EntriesIndexRoute: EntriesIndexRoute,
 }
 
@@ -154,6 +185,7 @@ export const routeTree = rootRoute
         "/create",
         "/edit",
         "/settings",
+        "/entries/$entryId",
         "/entries/"
       ]
     },
@@ -168,6 +200,9 @@ export const routeTree = rootRoute
     },
     "/settings": {
       "filePath": "settings.tsx"
+    },
+    "/entries/$entryId": {
+      "filePath": "entries/$entryId.tsx"
     },
     "/entries/": {
       "filePath": "entries/index.tsx"

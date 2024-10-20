@@ -1,5 +1,5 @@
 import React from 'react';
-import { Entry } from '../../types';
+import { EntryType } from '@/schema';
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 
 
 interface BasicInfoProps {
-  formData: Partial<Entry>;
+  formData: Partial<EntryType>;
   handleInputChange: (name: string, value: string | boolean) => void;
 }
 

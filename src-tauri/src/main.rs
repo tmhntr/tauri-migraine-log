@@ -3,10 +3,10 @@
 
 use tauri_plugin_sql::{Migration, MigrationKind};
 
-mod db;
+// mod db;
 
 fn main() {
-    db::init();
+    // db::init();
     let migrations = vec![
         // Define your migrations here
         Migration {
@@ -14,7 +14,6 @@ fn main() {
             description: "create_initial_tables",
             sql: 
             "
-            DROP TABLE IF EXISTS entries;
             CREATE TABLE IF NOT EXISTS entries (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 episode_date DATE DEFAULT NULL,
@@ -57,13 +56,13 @@ fn main() {
 
     tauri::Builder::default()
         .plugin(tauri_plugin_fs::init())
-        .setup(|_app| {
-            // Initialize the database.
-            db::init();
+        // .setup(|_app| {
+        //     // Initialize the database.
+        //     db::init();
 
-            Ok(())
-        })
-        .plugin(tauri_plugin_sql::Builder::default().add_migrations(&("sqlite:".to_owned() + &db::get_db_path()), migrations).build())
+        //     Ok(())
+        // })
+        .plugin(tauri_plugin_sql::Builder::default().add_migrations("sqlite:database.sqlite", migrations).build())
         .plugin(tauri_plugin_shell::init())
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
