@@ -24,8 +24,8 @@ function DataTablePage() {
         <div className="flex flex-col">
           {isLoading ? (
             <Loader />
-          ) : (
-            <DataTable data={data ?? []} columns={columns} />
+          ) :  data && (
+            <DataTable data={data} columns={defaultColumns} />
           )}
         </div>
       </div>
@@ -36,7 +36,8 @@ function DataTablePage() {
 import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Loader } from "lucide-react";
-import { columns } from "@/components/entry-table/columns";
+import { defaultColumns } from "@/components/entry-table/columns";
+// import { EntryType } from "@/schema";
 
 export const Route = createFileRoute("/entries/")({
   component: DataTablePage,

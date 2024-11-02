@@ -1,4 +1,4 @@
-import { createColumnHelper } from "@tanstack/react-table";
+import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { EntryType } from "../../schema";
 import { DataTableRowActions } from "./data-table-row-actions";
 import { Badge } from "../ui/badge";
@@ -37,35 +37,33 @@ export const colorCodes = (severity: EntryType["headache_severity"]) => {
 
 const columnHelper = createColumnHelper<EntryType>();
 
-export const columns = [
+export const defaultColumns: ColumnDef<EntryType, null>[] = [
   columnHelper.accessor("episode_date", {
     header: "Date",
-    cell: (row) => {const date = row.getValue();
-      return date ? `${new Date(date).toDateString()}` : ''},
+    cell: (row) => {
+      const date = row.getValue();
+      return date ? `${new Date(date).toDateString()}` : "";
+    },
   }),
   columnHelper.accessor("headache_severity", {
     header: "Severity",
+    id: "headache_severity",
     cell: (props) => (
-          <Badge
-            className={colorCodes(props.getValue())}
-          >
-            {props.getValue()}
-          </Badge>
-        ),
+      <Badge className={colorCodes(props.getValue())}>{props.getValue()}</Badge>
+    ),
   }),
-  columnHelper.accessor((row) => `${getEntrySymptoms(row)}`, {
-    id: 'symptoms',
-  }),
-  {
-    id: "factors_brought_on",
-    header: "Triggers",
-  },
-  {
-    id: "factors_relieve",
-    header: "Relief Factors",
-  },
   columnHelper.display({
-    id: 'actions',
-    cell: (row) => <DataTableRowActions entry={row.row.original} />,
+    id: "symptoms",
+    cell: (props) => `${getEntrySymptoms(props.row.original)}`
+  }),
+  columnHelper.accessor("factors_brought_on", {
+    header: "Triggers",
+  }),
+  columnHelper.accessor("factors_relieve", {
+    header: "Relief factors",
+  }),
+  columnHelper.display({
+    id: "actions",
+    cell: (props) => <DataTableRowActions entry={props.row.original} />,
   }),
 ];

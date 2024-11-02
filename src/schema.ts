@@ -41,4 +41,4 @@ export const entrySchema = z.object({
 
 export type EntryType = z.infer<typeof entrySchema>
 
-export type CreateEntrySchema = Partial<Entry>
+export type CreateEntrySchema = Partial<EntryType>

@@ -16,19 +16,23 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-}
+// interface DataTableProps<TValue> 
+// {
+//   columns: ColumnDef<EntryType, TValue>[];
+//   data: EntryType[];
+// }
 
-export function DataTable<TValue>({
+export function DataTable({
   columns,
   data,
-}: DataTableProps<EntryType, TValue>) {
+}: {
+  columns: ColumnDef<EntryType, null>[];
+  data: EntryType[];
+}) {
   const table = useReactTable({
     data,
     columns,
-    getCoreRowModel: getCoreRowModel(),
+    getCoreRowModel: getCoreRowModel<EntryType>(),
     getRowId: (originalRow) => originalRow.id.toString(),
   });
 
