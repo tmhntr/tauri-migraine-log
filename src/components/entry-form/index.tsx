@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { addEntry } from "@/db";
-import BasicInfo from "@/components/entry-form/basic-info";
-import PainDetails from "@/components/entry-form/pain-details";
-import Symptoms from "@/components/entry-form/symptoms";
-import Warnings from "@/components/entry-form/warnings";
-import Factors from "@/components/entry-form/factors";
-import OtherDetails from "@/components/entry-form/other-details";
+import BasicInfo from "@/components/entry-form/BasicInfo";
+import PainDetails from "@/components/entry-form/PainDetails";
+import Symptoms from "@/components/entry-form/Symptoms";
+import Warnings from "@/components/entry-form/Warnings";
+import Factors from "@/components/entry-form/Factors";
+import OtherDetails from "@/components/entry-form/OtherDetails";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "@tanstack/react-router";
