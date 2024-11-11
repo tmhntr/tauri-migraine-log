@@ -9,7 +9,6 @@ import { Button } from "../ui/button";
 import { useCreateEntry } from "../../hooks/queries";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Card, CardContent, CardFooter } from "../ui/card";
-import { format } from "date-fns";
 import { useForm } from "@tanstack/react-form";
 import {
   CreateEntry,
@@ -19,13 +18,9 @@ import {
   Warning,
 } from "@/schema";
 import { zodValidator } from "@tanstack/zod-form-adapter";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { CalendarIcon } from "@radix-ui/react-icons";
-import { Calendar } from "../ui/calendar";
-import { cn } from "@/lib/utils";
-import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { DateTimePicker, TimePicker } from "../ui/datetime-picker";
+import { DateTimePicker } from "../ui/datetime-picker";
+import { Slider } from "../ui/slider";
 
 export default function EntryForm() {
   const createEntry = useCreateEntry();
@@ -39,7 +34,7 @@ export default function EntryForm() {
       hydration_oz: null,
       symptoms: [] as Symptom[],
       warnings: [] as Warning[],
-      painSites: [] as PainSite[],
+      pain_sites: [] as PainSite[],
       notes: "",
       recent_duration_of_sleep: null,
       warning_other: "",
@@ -57,11 +52,11 @@ export default function EntryForm() {
           ...value,
           symptoms: undefined,
           warnings: undefined,
-          painSites: undefined,
+          pain_sites: undefined,
         },
         symptomIds: value.symptoms.map((s) => s.id),
         warningIds: value.warnings.map((w) => w.id),
-        painSiteIds: value.painSites.map((p) => p.id),
+        painSiteIds: value.pain_sites.map((p) => p.id),
       });
     },
   });
@@ -74,6 +69,22 @@ export default function EntryForm() {
     { id: "factors", label: "Factors", component: Factors },
     { id: "other-details", label: "Other Details", component: OtherDetails },
   ];
+
+  const painLevels = ["Mild", "Moderate", "Severe", "Extreme"] as const
+  const painLevelColors = (painLevel: typeof painLevels[number] | null) => {
+    switch (painLevel) {
+      case "Mild":
+        return "bg-green-500";
+      case "Moderate":
+        return 'bg-yellow-500'
+      case "Severe":
+        return 'bg-orange-500'
+      case "Extreme":
+        return 'bg-red-500'
+      default:
+        return 'bg-black-600'
+    }
+  }
 
   const handleNext = () => {
     const currentIndex = tabs.findIndex((tab) => tab.id === activeTab);
@@ -118,10 +129,10 @@ export default function EntryForm() {
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="start_time">Start time</Label>
-                        <form.Field
-                          name="start_time"
-                          children={(field) => (
-                            <div className="flex space-x-2 items-center">
+                      <form.Field
+                        name="start_time"
+                        children={(field) => (
+                          <div className="flex space-x-2 items-center">
                             <DateTimePicker
                               granularity="minute"
                               className="w-min"
@@ -135,16 +146,24 @@ export default function EntryForm() {
                                 e && field.handleChange(e.toISOString())
                               }
                             ></DateTimePicker>
-                            <Button onClick={() => field.handleChange(new Date().toISOString())} >Now</Button></div>
-                          )}
-                        />
+                            <Button
+                              onClick={() =>
+                                field.handleChange(new Date().toISOString())
+                              }
+                            >
+                              Now
+                            </Button>
+                          </div>
+                        )}
+                      />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="start_time">End time</Label>
-                      <div className="flex space-x-2 items-center">
-                        <form.Field
-                          name="end_time"
-                          children={(field) => (
+                      <Label htmlFor="end_time">End time</Label>
+
+                      <form.Field
+                        name="end_time"
+                        children={(field) => (
+                          <div className="flex space-x-2 items-center">
                             <DateTimePicker
                               className="w-min"
                               hourCycle={12}
@@ -158,9 +177,67 @@ export default function EntryForm() {
                                   : undefined
                               }
                             />
-                          )}
-                        />
-                      </div>
+                            <Button
+                              onClick={() =>
+                                field.handleChange(new Date().toISOString())
+                              }
+                            >
+                              Now
+                            </Button>
+                          </div>
+                        )}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="headache_severity">
+                        Headache severity
+                      </Label>
+
+                      <form.Field
+                        name="headache_severity"
+                        children={(field) => (
+                          <div className="flex space-x-2 items-center">
+                            <div className={`rounded-sm w-24 p-2 text-white flex items-center justify-center ${painLevelColors(field.state.value)}`}>{field.state.value}</div>
+                            <Slider defaultValue={[0]} min={0} max={3} onValueChange={e => field.handleChange(painLevels[e[0]])}/>
+                          </div>
+                        )}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="pain_sites">Pain sites</Label>
+
+                      <form.Field
+                        name="pain_sites"
+                        children={(field) => (
+                          <div className="flex space-x-2 items-center">
+                            
+                          </div>
+                        )}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="symptoms">Symptoms</Label>
+
+                      <form.Field
+                        name="symptoms"
+                        children={(field) => (
+                          <div className="flex space-x-2 items-center">
+                            
+                          </div>
+                        )}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="warnings">Warnings</Label>
+
+                      <form.Field
+                        name="warnings"
+                        children={(field) => (
+                          <div className="flex space-x-2 items-center">
+                            
+                          </div>
+                        )}
+                      />
                     </div>
                   </div>
                 )}

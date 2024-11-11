@@ -23,18 +23,18 @@ fn main() {
                     hydration_oz INTEGER DEFAULT NULL,
                     weather_id INTEGER DEFAULT NULL,
                     warning_other TEXT DEFAULT NULL,
-                    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
                     FOREIGN KEY (weather_id) REFERENCES Weather(id) ON DELETE SET NULL
                 );
 
                 -- Add the update trigger
-                CREATE TRIGGER IF NOT EXISTS update_Entry_updatedAt
+                CREATE TRIGGER IF NOT EXISTS update_Entry_updated_at
                 AFTER UPDATE ON Entry
                 FOR EACH ROW
                 BEGIN
-                    UPDATE Entry SET updatedAt = CURRENT_TIMESTAMP WHERE id = OLD.id;
+                    UPDATE Entry SET updated_at = CURRENT_TIMESTAMP WHERE id = OLD.id;
                 END;
 
                 -- Create supporting tables
@@ -45,13 +45,13 @@ fn main() {
 
                 CREATE TABLE IF NOT EXISTS PainSiteEntry (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    entryId INTEGER NOT NULL,
-                    painSiteId INTEGER NOT NULL,
+                    entry_id INTEGER NOT NULL,
+                    pain_site_id INTEGER NOT NULL,
                     
-                    FOREIGN KEY (entryId) REFERENCES Entry(id) ON DELETE CASCADE,
-                    FOREIGN KEY (painSiteId) REFERENCES PainSite(id) ON DELETE CASCADE,
+                    FOREIGN KEY (entry_id) REFERENCES Entry(id) ON DELETE CASCADE,
+                    FOREIGN KEY (pain_site_id) REFERENCES PainSite(id) ON DELETE CASCADE,
                     
-                    UNIQUE (entryId, painSiteId)
+                    UNIQUE (entry_id, pain_site_id)
                 );
 
                 CREATE TABLE IF NOT EXISTS Symptom (
@@ -61,13 +61,13 @@ fn main() {
 
                 CREATE TABLE IF NOT EXISTS SymptomEntry (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    entryId INTEGER NOT NULL,
-                    symptomId INTEGER NOT NULL,
+                    entry_id INTEGER NOT NULL,
+                    symptom_id INTEGER NOT NULL,
                     
-                    FOREIGN KEY (entryId) REFERENCES Entry(id) ON DELETE CASCADE,
-                    FOREIGN KEY (symptomId) REFERENCES Symptom(id) ON DELETE CASCADE,
+                    FOREIGN KEY (entry_id) REFERENCES Entry(id) ON DELETE CASCADE,
+                    FOREIGN KEY (symptom_id) REFERENCES Symptom(id) ON DELETE CASCADE,
                     
-                    UNIQUE (entryId, symptomId)
+                    UNIQUE (entry_id, symptom_id)
                 );
 
                 CREATE TABLE IF NOT EXISTS Weather (
@@ -86,13 +86,13 @@ fn main() {
                 -- Add WarningEntry join table
                 CREATE TABLE IF NOT EXISTS WarningEntry (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    entryId INTEGER NOT NULL,
-                    warningId INTEGER NOT NULL,
+                    entry_id INTEGER NOT NULL,
+                    warning_id INTEGER NOT NULL,
                     
-                    FOREIGN KEY (entryId) REFERENCES Entry(id) ON DELETE CASCADE,
-                    FOREIGN KEY (warningId) REFERENCES Warning(id) ON DELETE CASCADE,
+                    FOREIGN KEY (entry_id) REFERENCES Entry(id) ON DELETE CASCADE,
+                    FOREIGN KEY (warning_id) REFERENCES Warning(id) ON DELETE CASCADE,
                     
-                    UNIQUE (entryId, warningId)
+                    UNIQUE (entry_id, warning_id)
                 );
 
                 -- Insert initial data

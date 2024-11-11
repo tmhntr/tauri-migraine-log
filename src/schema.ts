@@ -31,14 +31,14 @@ const entrySchema = z.object({
   headache_severity: z.enum(['Mild', 'Moderate', 'Severe', 'Extreme']).nullable(),
   hydration_oz: z.number().nullable(),
   warning_other: z.string().nullable(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
+  created_at: z.string(),
+  updated_at: z.string(),
   symptoms: z.array(symptomsSchema),
-  painSites: z.array(painSiteSchema),
+  pain_sites: z.array(painSiteSchema),
   warnings: z.array(warningSchema),
   weather: weatherSchema.nullable()
 })
-export const createEntrySchema = entrySchema.omit({id: true, updatedAt: true, createdAt: true})
+export const createEntrySchema = entrySchema.omit({id: true, updated_at: true, created_at: true})
 
 
 export type EntryData = z.infer<typeof entrySchema>

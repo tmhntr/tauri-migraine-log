@@ -43,7 +43,7 @@ const EntryView = () => {
                   <div>
                     <p className="font-semibold">Locations:</p>
                     <ul className="list-disc list-inside">
-                      {entry.painSites.map(painSite => 
+                      {entry.pain_sites.map(painSite => 
                         <li key={painSite.id}>{painSite.name}</li>
                       )}
                     </ul>

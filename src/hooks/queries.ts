@@ -65,28 +65,28 @@ export const useGetEntry = (id: number) => {
       // Get related data
       const painSites = await db.select(
         `SELECT PainSite.* FROM PainSite 
-         JOIN PainSiteEntry ON PainSite.id = PainSiteEntry.painSiteId 
-         WHERE PainSiteEntry.entryId = ?`,
+         JOIN PainSiteEntry ON PainSite.id = PainSiteEntry.pain_site_id 
+         WHERE PainSiteEntry.entry_id = ?`,
         [id]
       );
 
       const symptoms = await db.select(
         `SELECT Symptom.* FROM Symptom
-         JOIN SymptomEntry ON Symptom.id = SymptomEntry.symptomId
-         WHERE SymptomEntry.entryId = ?`,
+         JOIN SymptomEntry ON Symptom.id = SymptomEntry.symptom_id
+         WHERE SymptomEntry.entry_id = ?`,
         [id]
       );
 
       const warnings = await db.select(
         `SELECT Warning.* FROM Warning
-         JOIN WarningEntry ON Warning.id = WarningEntry.warningId
-         WHERE WarningEntry.entryId = ?`,
+         JOIN WarningEntry ON Warning.id = WarningEntry.warning_id
+         WHERE WarningEntry.entry_id = ?`,
         [id]
       );
 
       return {
         ...entry,
-        painSites,
+        pain_sites: painSites,
         symptoms, 
         warnings
       } as EntryData;
@@ -146,7 +146,7 @@ export const useCreateEntry = () => {
       // Insert pain site relations
       for (const painSiteId of painSiteIds) {
         await db.execute(
-          'INSERT INTO PainSiteEntry (entryId, painSiteId) VALUES (?, ?)',
+          'INSERT INTO PainSiteEntry (entry_id, pain_site_id) VALUES (?, ?)',
           [entryId, painSiteId]
         );
       }
@@ -154,7 +154,7 @@ export const useCreateEntry = () => {
       // Insert symptom relations  
       for (const symptomId of symptomIds) {
         await db.execute(
-          'INSERT INTO SymptomEntry (entryId, symptomId) VALUES (?, ?)',
+          'INSERT INTO SymptomEntry (entry_id, symptom_id) VALUES (?, ?)',
           [entryId, symptomId]
         );
       }
@@ -162,7 +162,7 @@ export const useCreateEntry = () => {
       // Insert warning relations
       for (const warningId of warningIds) {
         await db.execute(
-          'INSERT INTO WarningEntry (entryId, warningId) VALUES (?, ?)',
+          'INSERT INTO WarningEntry (entry_id, warning_id) VALUES (?, ?)',
           [entryId, warningId]
         );
       }
@@ -183,9 +183,9 @@ export const useDeleteEntry = () => {
       const db = await getDb();
       
       // Delete relations first due to foreign key constraints
-      await db.execute('DELETE FROM PainSiteEntry WHERE entryId = ?', [id]);
-      await db.execute('DELETE FROM SymptomEntry WHERE entryId = ?', [id]);
-      await db.execute('DELETE FROM WarningEntry WHERE entryId = ?', [id]);
+      await db.execute('DELETE FROM PainSiteEntry WHERE entry_id = ?', [id]);
+      await db.execute('DELETE FROM SymptomEntry WHERE entry_id = ?', [id]);
+      await db.execute('DELETE FROM WarningEntry WHERE entry_id = ?', [id]);
       
       // Delete the entry
       await db.execute('DELETE FROM Entry WHERE id = ?', [id]);
@@ -221,27 +221,27 @@ export const useUpdateEntry = () => {
       await db.execute(query, [...keys.map(key => entry[key as keyof Entry]), id]);
 
       // Update relations by removing old ones and inserting new ones
-      await db.execute('DELETE FROM PainSiteEntry WHERE entryId = ?', [id]);
-      await db.execute('DELETE FROM SymptomEntry WHERE entryId = ?', [id]);
-      await db.execute('DELETE FROM WarningEntry WHERE entryId = ?', [id]);
+      await db.execute('DELETE FROM PainSiteEntry WHERE entry_id = ?', [id]);
+      await db.execute('DELETE FROM SymptomEntry WHERE entry_id = ?', [id]);
+      await db.execute('DELETE FROM WarningEntry WHERE entry_id = ?', [id]);
 
       for (const painSiteId of painSiteIds) {
         await db.execute(
-          'INSERT INTO PainSiteEntry (entryId, painSiteId) VALUES (?, ?)',
+          'INSERT INTO PainSiteEntry (entry_id, pain_site_id) VALUES (?, ?)',
           [id, painSiteId]
         );
       }
 
       for (const symptomId of symptomIds) {
         await db.execute(
-          'INSERT INTO SymptomEntry (entryId, symptomId) VALUES (?, ?)',
+          'INSERT INTO SymptomEntry (entry_id, symptom_id) VALUES (?, ?)',
           [id, symptomId]
         );
       }
 
       for (const warningId of warningIds) {
         await db.execute(
-          'INSERT INTO WarningEntry (entryId, warningId) VALUES (?, ?)',
+          'INSERT INTO WarningEntry (entry_id, warning_id) VALUES (?, ?)',
           [id, warningId]
         );
       }
