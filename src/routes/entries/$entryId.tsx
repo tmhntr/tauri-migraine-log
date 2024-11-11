@@ -22,7 +22,7 @@ const EntryView = () => {
         ) : entry ? (
           <div className="space-y-6">
             <h1 className="text-3xl font-bold">
-              {new Date(entry.start_date || "").toDateString()}
+              {new Date(entry.start_time || "").toDateString()}
             </h1>
 
             <Card>
