@@ -6,7 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { EntryType } from "@/schema";
+import { Entry } from "@/schema";
 import { useNavigate } from "@tanstack/react-router";
 
 import {
@@ -26,13 +26,13 @@ export function DataTable({
   columns,
   data,
 }: {
-  columns: ColumnDef<EntryType, null>[];
-  data: EntryType[];
+  columns: ColumnDef<Entry, null>[];
+  data: Entry[];
 }) {
   const table = useReactTable({
     data,
     columns,
-    getCoreRowModel: getCoreRowModel<EntryType>(),
+    getCoreRowModel: getCoreRowModel<Entry>(),
     getRowId: (originalRow) => originalRow.id.toString(),
   });
 

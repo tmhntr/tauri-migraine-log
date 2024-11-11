@@ -1,150 +1,193 @@
-import React, { useState } from "react";
-import { addEntry } from "@/db";
-import BasicInfo from "@/components/entry-form/BasicInfo";
-import PainDetails from "@/components/entry-form/PainDetails";
-import Symptoms from "@/components/entry-form/Symptoms";
-import Warnings from "@/components/entry-form/Warnings";
-import Factors from "@/components/entry-form/Factors";
-import OtherDetails from "@/components/entry-form/OtherDetails";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "@tanstack/react-router";
-import { EntryType } from "@/schema";
+import { useState } from "react";
+import { BasicInfo } from "./BasicInfo";
+import { PainDetails } from "./PainDetails";
+import { Symptoms } from "./Symptoms";
+import { Warnings } from "./Warnings";
+import { Factors } from "./Factors";
+import { OtherDetails } from "./OtherDetails";
+import { Button } from "../ui/button";
+import { useCreateEntry } from "../../hooks/queries";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import { Card, CardContent, CardFooter } from "../ui/card";
+import { format } from "date-fns";
+import { useForm } from "@tanstack/react-form";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
-import { X } from "lucide-react";
+  CreateEntry,
+  createEntrySchema,
+  PainSite,
+  Symptom,
+  Warning,
+} from "@/schema";
+import { zodValidator } from "@tanstack/zod-form-adapter";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { CalendarIcon } from "@radix-ui/react-icons";
+import { Calendar } from "../ui/calendar";
+import { cn } from "@/lib/utils";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { DateTimePicker, TimePicker } from "../ui/datetime-picker";
 
-const CreateEntryForm: React.FC = () => {
-  const [formData, setFormData] = useState<Partial<EntryType>>({});
-
-  const handleInputChange = (name: string, value: string | boolean) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-  const navigate = useNavigate({ from: "/create" });
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const id = await addEntry(formData);
-    console.log("Entry added successfully");
-    navigate({ to: "/entries/$entryId", params: { entryId: `${id}` } });
-  };
-
-  const handleReset = async (e: React.FormEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    navigate({ to: "/" });
-  };
+export default function EntryForm() {
+  const createEntry = useCreateEntry();
+  const [activeTab, setActiveTab] = useState("basic-info");
+  const form = useForm({
+    defaultValues: {
+      start_date: new Date().toDateString(),
+      start_time: "",
+      end_time: null,
+      headache_severity: null,
+      hydration_oz: null,
+      symptoms: [] as Symptom[],
+      warnings: [] as Warning[],
+      painSites: [] as PainSite[],
+      notes: "",
+      recent_duration_of_sleep: null,
+      warning_other: "",
+      weather: null,
+    } as CreateEntry,
+    validators: {
+      onChange: createEntrySchema,
+    },
+    validatorAdapter: zodValidator(),
+    onSubmit: async ({ value }) => {
+      // Do something with form data
+      console.log(value);
+      createEntry.mutate({
+        entry: {
+          ...value,
+          symptoms: undefined,
+          warnings: undefined,
+          painSites: undefined,
+        },
+        symptomIds: value.symptoms.map((s) => s.id),
+        warningIds: value.warnings.map((w) => w.id),
+        painSiteIds: value.painSites.map((p) => p.id),
+      });
+    },
+  });
 
   const tabs = [
-    "basic-info",
-    "pain",
-    "symptoms",
-    "warnings",
-    "factors",
-    "other",
+    { id: "basic-info", label: "Basic Info", component: BasicInfo },
+    { id: "pain-details", label: "Pain Details", component: PainDetails },
+    { id: "symptoms", label: "Symptoms", component: Symptoms },
+    { id: "warnings", label: "Warnings", component: Warnings },
+    { id: "factors", label: "Factors", component: Factors },
+    { id: "other-details", label: "Other Details", component: OtherDetails },
   ];
 
-  const [tabState, setTabState] = useState("basic-info");
-
-  const nextTab = () => {
-    const currentIndex = tabs.indexOf(tabState);
+  const handleNext = () => {
+    const currentIndex = tabs.findIndex((tab) => tab.id === activeTab);
     if (currentIndex < tabs.length - 1) {
-      setTabState(tabs[currentIndex + 1]);
+      setActiveTab(tabs[currentIndex + 1].id);
     }
   };
 
-  const prevTab = () => {
-    const currentIndex = tabs.indexOf(tabState);
+  const handlePrevious = () => {
+    const currentIndex = tabs.findIndex((tab) => tab.id === activeTab);
     if (currentIndex > 0) {
-      setTabState(tabs[currentIndex - 1]);
+      setActiveTab(tabs[currentIndex - 1].id);
     }
   };
 
   return (
-    <Card className="max-w-prose mx-auto">
-      <form onSubmit={handleSubmit} onReset={handleReset}>
-        <CardHeader className="flex flex-row justify-between">
-          <div className="flex flex-col gap-2">
-            <CardTitle>Create New Entry</CardTitle>
-            <CardDescription>
-              Add in key information about the migraine episode that you want to
-              record.
-            </CardDescription>
-          </div>
-          <Button variant={"ghost"} className="w-10 h-10 p-0 rounded-full" type="reset">
-            <X className="w-4 h-4" />
-          </Button>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="basic-info" className="" value={tabState} onValueChange={setTabState}>
-            <TabsList>
-              <TabsTrigger value="basic-info">Basic Info</TabsTrigger>
-              <TabsTrigger value="pain">Pain</TabsTrigger>
-              <TabsTrigger value="symptoms">Symptoms</TabsTrigger>
-              <TabsTrigger value="warnings">Warnings</TabsTrigger>
-              <TabsTrigger value="factors">Factors</TabsTrigger>
-              <TabsTrigger value="other">Other details</TabsTrigger>
-            </TabsList>
-            <TabsContent value="basic-info">
-              <BasicInfo
-                formData={formData}
-                handleInputChange={handleInputChange}
-              />
-            </TabsContent>
-            <TabsContent value="pain">
-              <PainDetails
-                formData={formData}
-                handleInputChange={handleInputChange}
-              />
-            </TabsContent>
-            <TabsContent value="symptoms">
-              <Symptoms
-                formData={formData}
-                handleInputChange={handleInputChange}
-              />
-            </TabsContent>
-            <TabsContent value="warnings">
-              <Warnings
-                formData={formData}
-                handleInputChange={handleInputChange}
-              />
-            </TabsContent>
-            <TabsContent value="factors">
-              <Factors
-                formData={formData}
-                handleInputChange={handleInputChange}
-              />
-            </TabsContent>
-            <TabsContent value="other">
-              <OtherDetails
-                formData={formData}
-                handleInputChange={handleInputChange}
-              />
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-        <CardFooter className="flex flex-row justify-between">
-          <div className="flex gap-2">
-            {tabs.indexOf(tabState) > 0  && <Button variant={"secondary"} onClick={prevTab} type="button">
-              Previous
-            </Button>}
-            {tabs.indexOf(tabState) < tabs.length - 1 && <Button variant={"secondary"} onClick={nextTab} type="button">
-              Next
-            </Button>}
-          </div>
-          <Button type="submit">Submit</Button>
-        </CardFooter>
-      </form>
-    </Card>
-  );
-};
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        form.handleSubmit();
+      }}
+    >
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="my-8 mx-8 space-y-4"
+      >
+        <TabsList className="grid w-full grid-cols-6">
+          {tabs.map((tab) => (
+            <TabsTrigger key={tab.id} value={tab.id}>
+              {tab.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
 
-export default CreateEntryForm;
+        {tabs.map((tab) => (
+          <TabsContent key={tab.id} value={tab.id}>
+            <Card>
+              <CardContent className="space-y-4 pt-6">
+                {tab.id === "basic-info" && (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="start_time">Start time</Label>
+                        <form.Field
+                          name="start_time"
+                          children={(field) => (
+                            <div className="flex space-x-2 items-center">
+                            <DateTimePicker
+                              granularity="minute"
+                              className="w-min"
+                              hourCycle={12}
+                              value={
+                                field.state.value
+                                  ? new Date(field.state.value)
+                                  : undefined
+                              }
+                              onChange={(e) =>
+                                e && field.handleChange(e.toISOString())
+                              }
+                            ></DateTimePicker>
+                            <Button onClick={() => field.handleChange(new Date().toISOString())} >Now</Button></div>
+                          )}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="start_time">End time</Label>
+                      <div className="flex space-x-2 items-center">
+                        <form.Field
+                          name="end_time"
+                          children={(field) => (
+                            <DateTimePicker
+                              className="w-min"
+                              hourCycle={12}
+                              granularity="minute"
+                              onChange={(e) => {
+                                e && field.handleChange(e.toISOString());
+                              }}
+                              value={
+                                field.state.value
+                                  ? new Date(field.state.value)
+                                  : undefined
+                              }
+                            />
+                          )}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+              <CardFooter className="flex justify-between">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handlePrevious}
+                  disabled={tab.id === tabs[0].id}
+                >
+                  Previous
+                </Button>
+                {tab.id === tabs[tabs.length - 1].id ? (
+                  <Button type="submit" disabled={createEntry.isPending}>
+                    {createEntry.isPending ? "Saving..." : "Save Entry"}
+                  </Button>
+                ) : (
+                  <Button type="button" onClick={handleNext}>
+                    Next
+                  </Button>
+                )}
+              </CardFooter>
+            </Card>
+          </TabsContent>
+        ))}
+      </Tabs>
+    </form>
+  );
+}

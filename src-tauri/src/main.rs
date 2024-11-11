@@ -8,62 +8,129 @@ use tauri_plugin_sql::{Migration, MigrationKind};
 fn main() {
     // db::init();
     let migrations = vec![
-        // Define your migrations here
         Migration {
             version: 1,
-            description: "create_initial_tables",
-            sql: 
-            "
-            CREATE TABLE IF NOT EXISTS entries (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                episode_date DATE DEFAULT NULL,
-                estimated_onset_time TIME DEFAULT NULL,
-                estimated_onset_period TEXT CHECK (estimated_onset_period IN ('AM', 'PM')) DEFAULT NULL,
-                estimated_ended_time TIME DEFAULT NULL,
-                estimated_ended_period TEXT CHECK (estimated_ended_period IN ('AM', 'PM')) DEFAULT NULL,
-                recent_duration_of_sleep TEXT DEFAULT NULL,  -- There is no INTERVAL type in SQLite, so we'll store duration as text
-                site_of_pain_front BOOLEAN DEFAULT NULL,
-                site_of_pain_back BOOLEAN DEFAULT NULL,
-                site_of_pain_left BOOLEAN DEFAULT NULL,
-                site_of_pain_right BOOLEAN DEFAULT NULL,
-                site_of_pain_top BOOLEAN DEFAULT NULL,
-                headache_severity TEXT CHECK (headache_severity IN ('Mild', 'Moderate', 'Severe', 'Extreme')) DEFAULT NULL,
-                weather TEXT DEFAULT NULL,
-                temperature_high INTEGER DEFAULT NULL,
-                temperature_low INTEGER DEFAULT NULL,
-                hydration_oz INTEGER DEFAULT NULL,
-                symptoms_throbbing BOOLEAN DEFAULT NULL,
-                symptoms_burning BOOLEAN DEFAULT NULL,
-                symptoms_dull_ache BOOLEAN DEFAULT NULL,
-                symptoms_knife_like BOOLEAN DEFAULT NULL,
-                symptoms_nausea BOOLEAN DEFAULT NULL,
-                symptoms_light_sensitivity BOOLEAN DEFAULT NULL,
-                symptoms_pressure BOOLEAN DEFAULT NULL,
-                symptoms_aura BOOLEAN DEFAULT NULL,
-                symptoms_tight_band BOOLEAN DEFAULT NULL,
-                symptoms_neck_ache BOOLEAN DEFAULT NULL,
-                warning_vision BOOLEAN DEFAULT NULL,
-                warning_numbness BOOLEAN DEFAULT NULL,
-                warning_aching_neck BOOLEAN DEFAULT NULL,
-                warning_other TEXT DEFAULT NULL,
-                factors_brought_on TEXT DEFAULT NULL,
-                factors_relieve TEXT DEFAULT NULL,
-                total_hours_of_migraine REAL DEFAULT NULL
-            );",
+            description: "create_normalized_tables",
+            sql: "
+                -- Create the main `Entry` table
+                CREATE TABLE IF NOT EXISTS Entry (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    start_time DATETIME,
+                    end_time DATETIME DEFAULT NULL,
+                    notes TEXT DEFAULT NULL,
+                    recent_duration_of_sleep TEXT DEFAULT NULL,
+                    headache_severity TEXT CHECK (headache_severity IN ('Mild', 'Moderate', 'Severe', 'Extreme')) DEFAULT NULL,
+                    hydration_oz INTEGER DEFAULT NULL,
+                    weather_id INTEGER DEFAULT NULL,
+                    warning_other TEXT DEFAULT NULL,
+                    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+                    FOREIGN KEY (weather_id) REFERENCES Weather(id) ON DELETE SET NULL
+                );
+
+                -- Add the update trigger
+                CREATE TRIGGER IF NOT EXISTS update_Entry_updatedAt
+                AFTER UPDATE ON Entry
+                FOR EACH ROW
+                BEGIN
+                    UPDATE Entry SET updatedAt = CURRENT_TIMESTAMP WHERE id = OLD.id;
+                END;
+
+                -- Create supporting tables
+                CREATE TABLE IF NOT EXISTS PainSite (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT UNIQUE NOT NULL
+                );
+
+                CREATE TABLE IF NOT EXISTS PainSiteEntry (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    entryId INTEGER NOT NULL,
+                    painSiteId INTEGER NOT NULL,
+                    
+                    FOREIGN KEY (entryId) REFERENCES Entry(id) ON DELETE CASCADE,
+                    FOREIGN KEY (painSiteId) REFERENCES PainSite(id) ON DELETE CASCADE,
+                    
+                    UNIQUE (entryId, painSiteId)
+                );
+
+                CREATE TABLE IF NOT EXISTS Symptom (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT UNIQUE NOT NULL
+                );
+
+                CREATE TABLE IF NOT EXISTS SymptomEntry (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    entryId INTEGER NOT NULL,
+                    symptomId INTEGER NOT NULL,
+                    
+                    FOREIGN KEY (entryId) REFERENCES Entry(id) ON DELETE CASCADE,
+                    FOREIGN KEY (symptomId) REFERENCES Symptom(id) ON DELETE CASCADE,
+                    
+                    UNIQUE (entryId, symptomId)
+                );
+
+                CREATE TABLE IF NOT EXISTS Weather (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    type TEXT NOT NULL,
+                    temperature_high INTEGER DEFAULT NULL,
+                    temperature_low INTEGER DEFAULT NULL
+                );
+
+                -- Add Warning table
+                CREATE TABLE IF NOT EXISTS Warning (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT UNIQUE NOT NULL
+                );
+
+                -- Add WarningEntry join table
+                CREATE TABLE IF NOT EXISTS WarningEntry (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    entryId INTEGER NOT NULL,
+                    warningId INTEGER NOT NULL,
+                    
+                    FOREIGN KEY (entryId) REFERENCES Entry(id) ON DELETE CASCADE,
+                    FOREIGN KEY (warningId) REFERENCES Warning(id) ON DELETE CASCADE,
+                    
+                    UNIQUE (entryId, warningId)
+                );
+
+                -- Insert initial data
+                INSERT INTO PainSite (name) VALUES 
+                    ('Front'),
+                    ('Back'),
+                    ('Left'),
+                    ('Right'),
+                    ('Top');
+
+                INSERT INTO Symptom (name) VALUES 
+                    ('Throbbing'),
+                    ('Burning'),
+                    ('Dull Ache'),
+                    ('Knife-like'),
+                    ('Nausea'),
+                    ('Light Sensitivity'),
+                    ('Pressure'),
+                    ('Aura'),
+                    ('Tight Band'),
+                    ('Neck Ache');
+
+                -- Insert initial warning data
+                INSERT INTO Warning (name) VALUES 
+                    ('Vision Changes'),
+                    ('Numbness'),
+                    ('Aching Neck');
+            ",
             kind: MigrationKind::Up,
         }
     ];
 
     tauri::Builder::default()
-        .plugin(tauri_plugin_fs::init())
-        // .setup(|_app| {
-        //     // Initialize the database.
-        //     db::init();
-
-        //     Ok(())
-        // })
-        .plugin(tauri_plugin_sql::Builder::default().add_migrations("sqlite:database.sqlite", migrations).build())
-        .plugin(tauri_plugin_shell::init())
+        .plugin(
+            tauri_plugin_sql::Builder::default()
+                .add_migrations("sqlite:database.sqlite", migrations)
+                .build(),
+        )
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

@@ -1,7 +1,7 @@
 import { colorCodes } from "@/components/entry-table/columns";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { getEntry } from "@/db";
+import { useGetEntry } from "@/hooks/queries";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
@@ -11,10 +11,7 @@ const EntryView = () => {
     data: entry,
     error,
     isLoading,
-  } = useQuery({
-    queryKey: ["entry", "entries"],
-    queryFn: () => getEntry(Number(entryId)),
-  });
+  } = useGetEntry(Number(entryId))
   return (
     <>
       <div className="container mx-auto p-4">
@@ -25,7 +22,7 @@ const EntryView = () => {
         ) : entry ? (
           <div className="space-y-6">
             <h1 className="text-3xl font-bold">
-              {new Date(entry.episode_date || "").toDateString()}
+              {new Date(entry.start_date || "").toDateString()}
             </h1>
 
             <Card>
@@ -46,11 +43,9 @@ const EntryView = () => {
                   <div>
                     <p className="font-semibold">Locations:</p>
                     <ul className="list-disc list-inside">
-                      {entry.site_of_pain_back && <li>Back</li>}
-                      {entry.site_of_pain_front && <li>Front</li>}
-                      {entry.site_of_pain_left && <li>Left</li>}
-                      {entry.site_of_pain_right && <li>Right</li>}
-                      {entry.site_of_pain_top && <li>Top</li>}
+                      {entry.painSites.map(painSite => 
+                        <li key={painSite.id}>{painSite.name}</li>
+                      )}
                     </ul>
                   </div>
                 </div>
@@ -63,25 +58,28 @@ const EntryView = () => {
               </CardHeader>
               <CardContent>
                 <ul className="list-disc list-inside">
-                  {entry.symptoms_aura && <li>Aura</li>}
-                  {entry.symptoms_burning && <li>Burning</li>}
-                  {entry.symptoms_dull_ache && <li>Dull Ache</li>}
-                  {entry.symptoms_knife_like && <li>Knife-like</li>}
-                  {entry.symptoms_light_sensitivity && (
-                    <li>Light Sensitivity</li>
-                  )}
-                  {entry.symptoms_nausea && <li>Nausea</li>}
-                  {entry.symptoms_neck_ache && <li>Nech Ache</li>}
-                  {entry.symptoms_pressure && <li>Pressure</li>}
-                  {entry.symptoms_throbbing && <li>Throbbing</li>}
-                  {entry.symptoms_tight_band && <li>Tight Band</li>}
+                  {
+                    entry.symptoms.map(symptoms => <li key={symptoms.id}>{symptoms.name}</li>)
+                  }
                 </ul>
               </CardContent>
             </Card>
-
             <Card>
               <CardHeader>
-                <CardTitle>Triggers and Factors</CardTitle>
+                <CardTitle>Warnings</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="list-disc list-inside">
+                  {
+                    entry.warnings.map(warning => <li key={warning.id}>{warning.name}</li>)
+                  }
+                  <li>{entry.warning_other}</li>
+                </ul>
+              </CardContent>
+            </Card>
+            {/* <Card>
+              <CardHeader>
+                <CardTitle>Warnings</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-4">
@@ -109,7 +107,7 @@ const EntryView = () => {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
         ) : (
           <div className="text-center">No entry found</div>

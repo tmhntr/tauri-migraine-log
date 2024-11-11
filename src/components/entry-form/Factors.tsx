@@ -1,16 +1,14 @@
 // { name: 'Factors', fields: ['factors_brought_on', 'factors_relieve'] },
-
-import React from 'react';
 import { EntryType } from '@/schema';
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-interface BasicInfoProps {
+interface FactorsProps {
   formData: Partial<EntryType>;
   handleInputChange: (name: string, value: string | boolean) => void;
 }
 
-const Factors: React.FC<BasicInfoProps> = ({ formData, handleInputChange }) => {
+export function Factors({ formData, handleInputChange }: FactorsProps) {
   return (
     <div className="space-y-4">
         <div>
@@ -24,5 +22,3 @@ const Factors: React.FC<BasicInfoProps> = ({ formData, handleInputChange }) => {
     </div>
   );
 };
-
-export default Factors;

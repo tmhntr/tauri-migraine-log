@@ -1,4 +1,3 @@
-import React from 'react';
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Calendar } from "@/components/ui/calendar"
@@ -13,7 +12,7 @@ interface BasicInfoProps {
   handleInputChange: (name: string, value: string | boolean) => void;
 }
 
-const BasicInfo: React.FC<BasicInfoProps> = ({ formData, handleInputChange }) => {
+export function BasicInfo({ formData, handleInputChange }: BasicInfoProps) {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
@@ -77,5 +76,3 @@ const BasicInfo: React.FC<BasicInfoProps> = ({ formData, handleInputChange }) =>
     </div>
   );
 };
-
-export default BasicInfo;

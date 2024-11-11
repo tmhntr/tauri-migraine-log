@@ -1,11 +1,8 @@
-import { getEntries } from "@/db";
+// import { getEntries } from "@/db";
 import { DataTable } from "@/components/entry-table";
 
 function DataTablePage() {
-  const { data, error, isLoading } = useQuery({
-    queryKey: ["entries"],
-    queryFn: getEntries,
-  });
+  const { data, error, isLoading } = useListEntries()
 
   if (error) return <Navigate />;
 
@@ -34,9 +31,9 @@ function DataTablePage() {
 }
 
 import { createFileRoute, Navigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
 import { Loader } from "lucide-react";
 import { defaultColumns } from "@/components/entry-table/columns";
+import { useListEntries } from "@/hooks/queries";
 // import { EntryType } from "@/schema";
 
 export const Route = createFileRoute("/entries/")({

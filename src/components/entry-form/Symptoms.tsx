@@ -1,61 +1,47 @@
-import React from 'react';
-import { EntryType } from '@/schema';
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { useState } from "react";
+import { Checkbox } from "../ui/checkbox";
+import { Label } from "../ui/label";
+import { useSymptoms } from "../../hooks/queries";
 
-// { name: 'Symptoms', fields: ['symptoms_throbbing', 'symptoms_burning', 'symptoms_dull_ache', 'symptoms_knife_like', 'symptoms_nausea', 'symptoms_light_sensitivity', 'symptoms_pressure', 'symptoms_aura', 'symptoms_tight_band', 'symptoms_neck_ache'] },
-
-
-interface BasicInfoProps {
-  formData: Partial<EntryType>;
-  handleInputChange: (name: string, value: string | boolean) => void;
+interface SymptomsProps {
+  onChange: (symptomIds: number[]) => void;
+  defaultValues?: {
+    symptomIds: number[];
+  };
 }
 
-const BasicInfo: React.FC<BasicInfoProps> = ({ formData, handleInputChange }) => {
+export function Symptoms({ onChange, defaultValues }: SymptomsProps) {
+  const { data: symptoms = [] } = useSymptoms();
+  const [selectedSymptoms, setSelectedSymptoms] = useState<number[]>(
+    defaultValues?.symptomIds || []
+  );
+
+  const handleSymptomChange = (symptomId: number, checked: boolean) => {
+    const newSelectedSymptoms = checked
+      ? [...selectedSymptoms, symptomId]
+      : selectedSymptoms.filter(id => id !== symptomId);
+    
+    setSelectedSymptoms(newSelectedSymptoms);
+    onChange(newSelectedSymptoms);
+  };
+
   return (
     <div className="space-y-4">
-      <div>
-        <Label>Throbbing</Label>
-        <Input type="checkbox" checked={formData.symptoms_throbbing || false} onChange={(e) => handleInputChange('symptoms_throbbing', e.target.checked)} />
-      </div>
-      <div>
-        <Label>Burning</Label>
-        <Input type="checkbox" checked={formData.symptoms_burning || false} onChange={(e) => handleInputChange('symptoms_burning', e.target.checked)} />
-      </div>
-      <div>
-        <Label>Dull Ache</Label>
-        <Input type="checkbox" checked={formData.symptoms_dull_ache || false} onChange={(e) => handleInputChange('symptoms_dull_ache', e.target.checked)} />
-      </div>
-      <div>
-        <Label>Knife-like</Label>
-        <Input type="checkbox" checked={formData.symptoms_knife_like || false} onChange={(e) => handleInputChange('symptoms_knife_like', e.target.checked)} />
-      </div>
-      <div>
-        <Label>Nausea</Label>
-        <Input type="checkbox" checked={formData.symptoms_nausea || false} onChange={(e) => handleInputChange('symptoms_nausea', e.target.checked)} />
-      </div>
-      <div>
-        <Label>Light Sensitivity</Label>
-        <Input type="checkbox" checked={formData.symptoms_light_sensitivity || false} onChange={(e) => handleInputChange('symptoms_light_sensitivity', e.target.checked)} />
-      </div>
-      <div>
-        <Label>Pressure</Label>
-        <Input type="checkbox" checked={formData.symptoms_pressure || false} onChange={(e) => handleInputChange('symptoms_pressure', e.target.checked)} />
-      </div>
-      <div>
-        <Label>Aura</Label>
-        <Input type="checkbox" checked={formData.symptoms_aura || false} onChange={(e) => handleInputChange('symptoms_aura', e.target.checked)} />
-      </div>
-      <div>
-        <Label>Tight Band</Label>
-        <Input type="checkbox" checked={formData.symptoms_tight_band || false} onChange={(e) => handleInputChange('symptoms_tight_band', e.target.checked)} />
-      </div>
-      <div>
-        <Label>Neck Ache</Label>
-        <Input type="checkbox" checked={formData.symptoms_neck_ache || false} onChange={(e) => handleInputChange('symptoms_neck_ache', e.target.checked)} />
+      <Label>Symptoms</Label>
+      <div className="grid grid-cols-2 gap-4">
+        {symptoms.map((symptom) => (
+          <div key={symptom.id} className="flex items-center space-x-2">
+            <Checkbox
+              id={`symptom-${symptom.id}`}
+              checked={selectedSymptoms.includes(symptom.id)}
+              onCheckedChange={(checked) => 
+                handleSymptomChange(symptom.id, checked as boolean)
+              }
+            />
+            <Label htmlFor={`symptom-${symptom.id}`}>{symptom.name}</Label>
+          </div>
+        ))}
       </div>
     </div>
   );
-};
-
-export default BasicInfo;
+}

@@ -18,14 +18,22 @@ import {
 } from "@radix-ui/react-dropdown-menu";
 import { ListFilter, File } from "lucide-react";
 const Home = () => {
-  const monthlyCountQuery = useQuery({
-    queryKey: ["entries", "month"],
-    queryFn: getMonthlyEpisodeCount,
-  });
-  const previousMonthlyCountQuery = useQuery({
-    queryKey: ["entries", "prevMonth"],
-    queryFn: getPreviousMonthlyEpisodeCount,
-  });
+  const today = new Date();
+  const lastMonth = new Date(
+    today.getFullYear(),
+    today.getMonth() - 1,
+    today.getDate()
+  );
+  const lastLastMonth = new Date(
+    today.getFullYear(),
+    today.getMonth() - 2,
+    today.getDate()
+  );
+  const monthlyCountQuery = useGetEpisodeCount(today, lastMonth);
+  const previousMonthlyCountQuery = useGetEpisodeCount(
+    lastMonth,
+    lastLastMonth
+  );
 
   return (
     <main className="grid flex-1 auto-rows-max items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 grid-cols-3">
@@ -57,9 +65,7 @@ const Home = () => {
         </CardHeader>
         <CardContent></CardContent>
         <CardFooter>
-          <div className="text-xs text-muted-foreground">
-            Coming soon 👀
-          </div>
+          <div className="text-xs text-muted-foreground">Coming soon 👀</div>
         </CardFooter>
       </Card>
       <Card
@@ -69,9 +75,7 @@ const Home = () => {
         <CardHeader className="pb-2">
           <CardDescription>Water tracker</CardDescription>
         </CardHeader>
-        <CardContent>
-          Track your water intake
-        </CardContent>
+        <CardContent>Track your water intake</CardContent>
         <CardFooter>Coming soon 👀</CardFooter>
       </Card>
       <Tabs defaultValue="week" className="col-span-3">
@@ -137,8 +141,7 @@ const Home = () => {
                   })()}
                 </div>
               </CardContent>
-              <CardFooter>
-              </CardFooter>
+              <CardFooter></CardFooter>
             </Card>
             <Card>
               <CardHeader className="px-7">
@@ -200,8 +203,7 @@ const Home = () => {
 };
 
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { getMonthlyEpisodeCount, getPreviousMonthlyEpisodeCount } from "@/db";
+import { useGetEpisodeCount } from "@/hooks/queries";
 
 export const Route = createFileRoute("/")({
   component: Home,

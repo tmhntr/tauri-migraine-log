@@ -1,15 +1,14 @@
-import React from 'react';
 import { EntryType } from '@/schema';
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 
-interface BasicInfoProps {
+interface OtherDetailsProps {
   formData: Partial<EntryType>;
   handleInputChange: (name: string, value: string | boolean) => void;
 }
 
-const OtherDetails: React.FC<BasicInfoProps> = ({ formData, handleInputChange }) => {
+export function OtherDetails({ formData, handleInputChange }: OtherDetailsProps) {
   return (
     <div className="space-y-4">
         <div>
@@ -39,5 +38,3 @@ const OtherDetails: React.FC<BasicInfoProps> = ({ formData, handleInputChange })
     </div>
   );
 };
-
-export default OtherDetails;

@@ -8,19 +8,11 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { EntryType } from "@/schema";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteEntry } from "@/db";
+import { EntryData } from "@/schema";
+import { useDeleteEntry } from "@/hooks/queries";
 
-export function DataTableRowActions({ entry }: { entry: EntryType }) {
-  const queryClient = useQueryClient();
-  const mutation = useMutation({
-    mutationFn: () => deleteEntry(entry.id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["entries"] });
-    },
-    mutationKey: ["entries"],
-  });
+export function DataTableRowActions({ entry }: { entry: EntryData }) {
+  const mutation = useDeleteEntry()
 
   return (
     <DropdownMenu>
@@ -40,7 +32,7 @@ export function DataTableRowActions({ entry }: { entry: EntryType }) {
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            mutation.mutate();
+            mutation.mutate(entry.id);
           }}
         >
           Delete
