@@ -6,7 +6,7 @@ import { Warnings } from "./Warnings";
 import { Factors } from "./Factors";
 import { OtherDetails } from "./OtherDetails";
 import { Button } from "../ui/button";
-import { useCreateEntry } from "../../hooks/queries";
+import { useCreateEntry, usePainSites, useSymptoms, useWarnings } from "../../hooks/queries";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Card, CardContent, CardFooter } from "../ui/card";
 import { useForm } from "@tanstack/react-form";
@@ -21,14 +21,19 @@ import { zodValidator } from "@tanstack/zod-form-adapter";
 import { Label } from "../ui/label";
 import { DateTimePicker } from "../ui/datetime-picker";
 import { Slider } from "../ui/slider";
+import MultipleSelector, { Option } from '../ui/multiple-selector';
 
 export default function EntryForm() {
   const createEntry = useCreateEntry();
   const [activeTab, setActiveTab] = useState("basic-info");
+
+  const symptomOptions = useSymptoms()
+  const warningsOptions = useWarnings()
+  const painSiteOptions = usePainSites()
+
   const form = useForm({
     defaultValues: {
-      start_date: new Date().toDateString(),
-      start_time: "",
+      start_time: new Date().toDateString(),
       end_time: null,
       headache_severity: null,
       hydration_oz: null,
@@ -44,7 +49,7 @@ export default function EntryForm() {
       onChange: createEntrySchema,
     },
     validatorAdapter: zodValidator(),
-    onSubmit: async ({ value }) => {
+    onSubmit: ({ value }) => {
       // Do something with form data
       console.log(value);
       createEntry.mutate({
@@ -63,28 +68,29 @@ export default function EntryForm() {
 
   const tabs = [
     { id: "basic-info", label: "Basic Info", component: BasicInfo },
-    { id: "pain-details", label: "Pain Details", component: PainDetails },
-    { id: "symptoms", label: "Symptoms", component: Symptoms },
-    { id: "warnings", label: "Warnings", component: Warnings },
-    { id: "factors", label: "Factors", component: Factors },
+    { id: "weather", label: "Weather", component: Factors },
     { id: "other-details", label: "Other Details", component: OtherDetails },
   ];
 
-  const painLevels = ["Mild", "Moderate", "Severe", "Extreme"] as const
-  const painLevelColors = (painLevel: typeof painLevels[number] | null) => {
+  const painLevels = ["Mild", "Moderate", "Severe", "Extreme"] as const;
+  const painLevelColors = (painLevel: (typeof painLevels)[number] | null) => {
     switch (painLevel) {
       case "Mild":
         return "bg-green-500";
       case "Moderate":
-        return 'bg-yellow-500'
+        return "bg-yellow-400";
       case "Severe":
-        return 'bg-orange-500'
+        return "bg-orange-500";
       case "Extreme":
-        return 'bg-red-500'
+        return "bg-red-500";
       default:
-        return 'bg-black-600'
+        return "bg-black-600";
     }
-  }
+  };
+
+  const painLevelIndex = (painLevel: (typeof painLevels)[number] | null) => {
+    return painLevel ? painLevels.findIndex((v) => v === painLevel) : 0;
+  };
 
   const handleNext = () => {
     const currentIndex = tabs.findIndex((tab) => tab.id === activeTab);
@@ -188,21 +194,34 @@ export default function EntryForm() {
                         )}
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="headache_severity">
-                        Headache severity
-                      </Label>
 
-                      <form.Field
-                        name="headache_severity"
-                        children={(field) => (
-                          <div className="flex space-x-2 items-center">
-                            <div className={`rounded-sm w-24 p-2 text-white flex items-center justify-center ${painLevelColors(field.state.value)}`}>{field.state.value}</div>
-                            <Slider defaultValue={[0]} min={0} max={3} onValueChange={e => field.handleChange(painLevels[e[0]])}/>
+                    <form.Field
+                      name="headache_severity"
+                      children={(field) => (
+                        <div className="space-y-2 flex flex-col">
+                          <Label htmlFor="headache_severity">
+                            Headache severity
+                          </Label>
+
+                          <div className="flex space-x-4">
+                            <Slider
+                              className="max-w-md py-4"
+                              value={[painLevelIndex(field.state.value)]}
+                              min={0}
+                              max={3}
+                              onValueChange={(e) =>
+                                field.handleChange(painLevels[e[0]])
+                              }
+                            />
+                            <div
+                              className={`rounded-sm w-24 p-2 text-white flex items-center justify-center ${painLevelColors(field.state.value)}`}
+                            >
+                              {field.state.value}
+                            </div>
                           </div>
-                        )}
-                      />
-                    </div>
+                        </div>
+                      )}
+                    />
                     <div className="space-y-2">
                       <Label htmlFor="pain_sites">Pain sites</Label>
 
@@ -210,7 +229,7 @@ export default function EntryForm() {
                         name="pain_sites"
                         children={(field) => (
                           <div className="flex space-x-2 items-center">
-                            
+                            <MultipleSelector options={painSiteOptions.data?.map(p => ({label: p.name, value: p.name} as Option)) || []} />
                           </div>
                         )}
                       />
@@ -221,9 +240,7 @@ export default function EntryForm() {
                       <form.Field
                         name="symptoms"
                         children={(field) => (
-                          <div className="flex space-x-2 items-center">
-                            
-                          </div>
+                          <div className="flex space-x-2 items-center"></div>
                         )}
                       />
                     </div>
@@ -233,9 +250,7 @@ export default function EntryForm() {
                       <form.Field
                         name="warnings"
                         children={(field) => (
-                          <div className="flex space-x-2 items-center">
-                            
-                          </div>
+                          <div className="flex space-x-2 items-center"></div>
                         )}
                       />
                     </div>
@@ -252,11 +267,23 @@ export default function EntryForm() {
                   Previous
                 </Button>
                 {tab.id === tabs[tabs.length - 1].id ? (
-                  <Button type="submit" disabled={createEntry.isPending}>
-                    {createEntry.isPending ? "Saving..." : "Save Entry"}
-                  </Button>
+                  <form.Subscribe
+                    selector={(state) => [state.canSubmit, state.isSubmitting]}
+                    children={([canSubmit, isSubmitting]) => (
+                      <Button type="submit" disabled={!canSubmit}>
+                        {isSubmitting ? "Saving..." : "Save Entry"}
+                      </Button>
+                    )}
+                  />
                 ) : (
-                  <Button type="button" onClick={handleNext}>
+                  // <Button type="submit" disabled={createEntry.isPending}>
+                  //   {createEntry.isPending ? "Saving..." : "Save Entry"}
+                  // </Button>
+                  <Button
+                    type="button"
+                    variant={"outline"}
+                    onClick={handleNext}
+                  >
                     Next
                   </Button>
                 )}

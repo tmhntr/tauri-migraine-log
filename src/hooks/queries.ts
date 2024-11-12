@@ -128,7 +128,7 @@ export const useCreateEntry = () => {
       
       // Insert the main entry
       const result = await db.execute(
-        'INSERT INTO Entry (start_time, end_time, notes, recent_duration_of_sleep, headache_severity, hydration_oz, weather_id, warning_other) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        'INSERT INTO Entry (start_time, end_time, notes, recent_duration_of_sleep, headache_severity, hydration_oz, weather_id, warning_other) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
         [
           entry.start_time,
           entry.end_time,
@@ -260,7 +260,7 @@ export const useGetEpisodeCount = (start_date: Date, end_date: Date) => {
       const result = await db.select<[{ count: number }]>(
         `SELECT COUNT(*) as count 
          FROM Entry 
-         WHERE start_date >= ? AND start_date <= ?`,
+         WHERE start_time >= ? AND start_time <= ?`,
         [start_date.toISOString().split('T')[0], end_date.toISOString().split('T')[0]]
       );
       return result[0].count;
