@@ -22,14 +22,32 @@ import { Label } from "../ui/label";
 import { DateTimePicker } from "../ui/datetime-picker";
 import { Slider } from "../ui/slider";
 import MultipleSelector, { Option } from '../ui/multiple-selector';
+import { UseQueryResult } from "@tanstack/react-query";
 
 export default function EntryForm() {
   const createEntry = useCreateEntry();
   const [activeTab, setActiveTab] = useState("basic-info");
 
-  const symptomOptions = useSymptoms()
-  const warningsOptions = useWarnings()
-  const painSiteOptions = usePainSites()
+  const symptomQuery = useSymptoms()
+  const warningsQuery = useWarnings()
+  const painSiteQuery = usePainSites()
+
+  const toOptionList = (l: {
+    id: number;
+    name: string;
+}[]) => {
+    return l.map(p => ({label: p.name, value: p.name} as Option))
+  }
+
+  const fromOptionList = (options: Option[], queryResult: {
+    id: number;
+    name: string;
+}[]) => {
+    if (!queryResult) return []
+    return queryResult.filter(item => 
+      options.some(option => option.value === item.name)
+    )
+}
 
   const form = useForm({
     defaultValues: {
@@ -229,7 +247,7 @@ export default function EntryForm() {
                         name="pain_sites"
                         children={(field) => (
                           <div className="flex space-x-2 items-center">
-                            <MultipleSelector options={painSiteOptions.data?.map(p => ({label: p.name, value: p.name} as Option)) || []} />
+                            <MultipleSelector value={toOptionList(field.state.value)} onChange={o => field.handleChange(fromOptionList(o, painSiteQuery.data || []))} options={toOptionList(painSiteQuery.data || [])} />
                           </div>
                         )}
                       />
@@ -240,7 +258,9 @@ export default function EntryForm() {
                       <form.Field
                         name="symptoms"
                         children={(field) => (
-                          <div className="flex space-x-2 items-center"></div>
+                          <div className="flex space-x-2 items-center">
+                            <MultipleSelector value={toOptionList(field.state.value)} onChange={o => field.handleChange(fromOptionList(o, symptomQuery.data || []))} options={toOptionList(symptomQuery.data || [])} />
+                          </div>
                         )}
                       />
                     </div>
@@ -250,7 +270,9 @@ export default function EntryForm() {
                       <form.Field
                         name="warnings"
                         children={(field) => (
-                          <div className="flex space-x-2 items-center"></div>
+                          <div className="flex space-x-2 items-center">
+                            <MultipleSelector value={toOptionList(field.state.value)} onChange={o => field.handleChange(fromOptionList(o, warningsQuery.data || []))} options={toOptionList(warningsQuery.data || [])} />
+                          </div>
                         )}
                       />
                     </div>
