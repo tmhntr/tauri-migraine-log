@@ -3,7 +3,7 @@ import { z } from "zod"
 
 const symptomsSchema = z.object({
   id: z.number(),
-  name: z.number(), 
+  name: z.string(), 
 })
 const painSiteSchema = z.object({
   id: z.number(),
