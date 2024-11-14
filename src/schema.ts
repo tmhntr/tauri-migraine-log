@@ -38,7 +38,7 @@ const entrySchema = z.object({
   warnings: z.array(warningSchema),
   weather: weatherSchema.nullable()
 })
-export const createEntrySchema = entrySchema.omit({id: true, updated_at: true, created_at: true})
+export const createEntrySchema = entrySchema.omit({id: true, updated_at: true, created_at: true}).extend({weather: createWeatherSchema.nullable()})
 
 
 export type EntryData = z.infer<typeof entrySchema>

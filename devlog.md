@@ -6,6 +6,7 @@ Complete:
 
 - [x] New entry form
 - [x] Database v1
+- [x] Entry form (improve)
 
 In progress:
 
@@ -14,7 +15,6 @@ In progress:
 
 Planned:
 
-- [ ] Entry form (improve)
 - [ ] Edit entry
 - [ ] Weather widget on home dashboard
 - [ ] Graph on entry dashboard
