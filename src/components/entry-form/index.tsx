@@ -20,7 +20,7 @@ import { useNavigate } from "@tanstack/react-router";
 export default function EntryForm() {
   const createEntry = useCreateEntry();
   const [activeTab, setActiveTab] = useState("basic-info");
-  const navigate = useNavigate({from: '/create'})
+  const navigate = useNavigate({ from: "/create" });
 
   const form = useForm({
     defaultValues: {
@@ -44,7 +44,10 @@ export default function EntryForm() {
       // Do something with form data
       console.log(value);
       const entryId = await createEntry.mutateAsync(value);
-      navigate({to: `/entries/$entryId`, params: {entryId: entryId.toString()}} )
+      navigate({
+        to: `/entries/$entryId`,
+        params: { entryId: entryId.toString() },
+      });
     },
   });
 

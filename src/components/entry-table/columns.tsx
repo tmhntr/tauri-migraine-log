@@ -1,26 +1,16 @@
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
-import { EntryType } from "../../schema";
+import { EntryData } from "../../schema";
 import { DataTableRowActions } from "./data-table-row-actions";
 import { Badge } from "../ui/badge";
 
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
-const getEntrySymptoms = (entry: EntryType) => {
-  const symptoms = [];
-  entry.symptoms_aura && symptoms.push("aura");
-  entry.symptoms_burning && symptoms.push("burning");
-  entry.symptoms_dull_ache && symptoms.push("dull ache");
-  entry.symptoms_knife_like && symptoms.push("knife-like");
-  entry.symptoms_light_sensitivity && symptoms.push("light sensitivity");
-  entry.symptoms_nausea && symptoms.push("nausea");
-  entry.symptoms_neck_ache && symptoms.push("neck ache");
-  entry.symptoms_pressure && symptoms.push("pressure");
-  entry.symptoms_throbbing && symptoms.push("throbbing");
-  entry.symptoms_tight_band && symptoms.push("tight band");
-  return symptoms.join(", ");
+// Helper function to format symptoms array into a string
+const getEntrySymptoms = (entry: EntryData) => {
+  return entry.symptoms?.map(s => s.name).join(", ") || '';
 };
 
-export const colorCodes = (severity: EntryType["headache_severity"]) => {
+export const colorCodes = (severity: EntryData["headache_severity"]) => {
+  if (!severity) return "";
+  
   switch (severity) {
     case "Extreme":
       return "bg-red-600";
@@ -35,32 +25,35 @@ export const colorCodes = (severity: EntryType["headache_severity"]) => {
   }
 };
 
-const columnHelper = createColumnHelper<EntryType>();
+const columnHelper = createColumnHelper<EntryData>();
 
-export const defaultColumns: ColumnDef<EntryType, null>[] = [
-  columnHelper.accessor("episode_date", {
-    header: "Date",
-    cell: (row) => {
-      const date = row.getValue();
-      return date ? `${new Date(date).toDateString()}` : "";
-    },
+export const defaultColumns: ColumnDef<EntryData, any>[] = [
+  columnHelper.accessor("start_time", {
+    header: "Start Time",
+    cell: (props) => props.getValue() ?? "N/A"
   }),
   columnHelper.accessor("headache_severity", {
     header: "Severity",
     id: "headache_severity",
     cell: (props) => (
-      <Badge className={colorCodes(props.getValue())}>{props.getValue()}</Badge>
+      <Badge className={colorCodes(props.getValue())}>
+        {props.getValue() ?? "N/A"}
+      </Badge>
     ),
   }),
   columnHelper.display({
     id: "symptoms",
-    cell: (props) => `${getEntrySymptoms(props.row.original)}`
+    header: "Symptoms",
+    cell: (props) => getEntrySymptoms(props.row.original)
   }),
-  columnHelper.accessor("factors_brought_on", {
-    header: "Triggers",
+  columnHelper.display({
+    id: "pain_sites",
+    header: "Pain Sites",
+    cell: (props) => props.row.original.pain_sites && props.row.original.pain_sites.map(site => site.name).join(", ")
   }),
-  columnHelper.accessor("factors_relieve", {
-    header: "Relief factors",
+  columnHelper.accessor("hydration_oz", {
+    header: "Hydration (oz)",
+    cell: (props) => props.getValue() ?? "N/A"
   }),
   columnHelper.display({
     id: "actions",

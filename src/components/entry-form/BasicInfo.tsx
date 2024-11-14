@@ -1,7 +1,7 @@
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { CreateEntry } from "@/schema";
-import { FormApi, ReactFormApi, Validator } from "@tanstack/react-form";
+import { ReactFormApi, Validator } from "@tanstack/react-form";
 import { DateTimePicker } from "../ui/datetime-picker";
 import { Slider } from "../ui/slider";
 import { usePainSites, useSymptoms, useWarnings } from "@/hooks/queries";
