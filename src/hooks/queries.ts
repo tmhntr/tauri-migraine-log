@@ -1,6 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Database from "@tauri-apps/plugin-sql";
-import { CreateEntry, CreateWeather, EntryData, PainSite, Symptom, Warning } from "../schema";
+import {
+  CreateEntry,
+  CreateWeather,
+  EntryData,
+  PainSite,
+  Symptom,
+  Warning,
+} from "../schema";
 
 // Database connection helper
 const getDb = async () => await Database.load("sqlite:database.sqlite");
@@ -56,7 +63,7 @@ export const useGetEntry = (id: number) => {
       const db = await getDb();
       const entries = await db.select<EntryData[]>(
         "SELECT * FROM Entry WHERE id = ?",
-        [id]
+        [id],
       );
 
       if (entries.length === 0) {
@@ -70,21 +77,21 @@ export const useGetEntry = (id: number) => {
         `SELECT PainSite.* FROM PainSite 
          JOIN PainSiteEntry ON PainSite.id = PainSiteEntry.pain_site_id 
          WHERE PainSiteEntry.entry_id = ?`,
-        [id]
+        [id],
       );
 
       const symptoms = await db.select(
         `SELECT Symptom.* FROM Symptom
          JOIN SymptomEntry ON Symptom.id = SymptomEntry.symptom_id
          WHERE SymptomEntry.entry_id = ?`,
-        [id]
+        [id],
       );
 
       const warnings = await db.select(
         `SELECT Warning.* FROM Warning
          JOIN WarningEntry ON Warning.id = WarningEntry.warning_id
          WHERE WarningEntry.entry_id = ?`,
-        [id]
+        [id],
       );
 
       return {
@@ -117,33 +124,26 @@ const useCreateWeather = () => {
       const db = await getDb();
       const result = await db.execute(
         "INSERT INTO Weather (type, temperature_high, temperature_low) VALUES (?, ?, ?)",
-        [
-          weather.type,
-          weather.temperature_high, 
-          weather.temperature_low,
-        ]
+        [weather.type, weather.temperature_high, weather.temperature_low],
       );
       return result.lastInsertId;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.entries });
-    }
+    },
   });
-}
-
+};
 
 // Entry mutations
 export const useCreateEntry = () => {
   const queryClient = useQueryClient();
-  const createWeather = useCreateWeather()
-
-  
+  const createWeather = useCreateWeather();
 
   return useMutation({
     mutationFn: async (entry: CreateEntry) => {
-      
-      const weatherId = entry.weather ? await createWeather.mutateAsync(entry.weather) : null
-      
+      const weatherId = entry.weather
+        ? await createWeather.mutateAsync(entry.weather)
+        : null;
 
       const db = await getDb();
 
@@ -159,7 +159,7 @@ export const useCreateEntry = () => {
           entry.hydration_oz,
           weatherId,
           entry.warning_other,
-        ]
+        ],
       );
 
       const entryId = result.lastInsertId;
@@ -168,7 +168,7 @@ export const useCreateEntry = () => {
       for (const painSite of entry.pain_sites) {
         await db.execute(
           "INSERT INTO PainSiteEntry (entry_id, pain_site_id) VALUES (?, ?)",
-          [entryId, painSite.id]
+          [entryId, painSite.id],
         );
       }
 
@@ -176,7 +176,7 @@ export const useCreateEntry = () => {
       for (const symptom of entry.symptoms) {
         await db.execute(
           "INSERT INTO SymptomEntry (entry_id, symptom_id) VALUES (?, ?)",
-          [entryId, symptom.id]
+          [entryId, symptom.id],
         );
       }
 
@@ -184,7 +184,7 @@ export const useCreateEntry = () => {
       for (const warning of entry.warnings) {
         await db.execute(
           "INSERT INTO WarningEntry (entry_id, warning_id) VALUES (?, ?)",
-          [entryId, warning.id]
+          [entryId, warning.id],
         );
       }
 
@@ -252,21 +252,21 @@ export const useUpdateEntry = () => {
       for (const painSiteId of painSiteIds) {
         await db.execute(
           "INSERT INTO PainSiteEntry (entry_id, pain_site_id) VALUES (?, ?)",
-          [id, painSiteId]
+          [id, painSiteId],
         );
       }
 
       for (const symptomId of symptomIds) {
         await db.execute(
           "INSERT INTO SymptomEntry (entry_id, symptom_id) VALUES (?, ?)",
-          [id, symptomId]
+          [id, symptomId],
         );
       }
 
       for (const warningId of warningIds) {
         await db.execute(
           "INSERT INTO WarningEntry (entry_id, warning_id) VALUES (?, ?)",
-          [id, warningId]
+          [id, warningId],
         );
       }
     },
@@ -288,7 +288,7 @@ export const useGetEpisodeCount = (start_date: Date, end_date: Date) => {
         [
           start_date.toISOString().split("T")[0],
           end_date.toISOString().split("T")[0],
-        ]
+        ],
       );
       return result[0].count;
     },

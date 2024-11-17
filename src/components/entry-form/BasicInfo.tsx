@@ -20,7 +20,7 @@ export function BasicInfo({ form }: Props) {
     l: {
       id: number;
       name: string;
-    }[]
+    }[],
   ) => {
     return l.map((p) => ({ label: p.name, value: p.name }) as Option);
   };
@@ -49,11 +49,11 @@ export function BasicInfo({ form }: Props) {
     queryResult: {
       id: number;
       name: string;
-    }[]
+    }[],
   ) => {
     if (!queryResult) return [];
     return queryResult.filter((item) =>
-      options.some((option) => option.value === item.name)
+      options.some((option) => option.value === item.name),
     );
   };
   return (
@@ -148,7 +148,7 @@ export function BasicInfo({ form }: Props) {
                 value={toOptionList(field.state.value)}
                 onChange={(o) =>
                   field.handleChange(
-                    fromOptionList(o, painSiteQuery.data || [])
+                    fromOptionList(o, painSiteQuery.data || []),
                   )
                 }
                 options={toOptionList(painSiteQuery.data || [])}
@@ -186,7 +186,7 @@ export function BasicInfo({ form }: Props) {
                 value={toOptionList(field.state.value)}
                 onChange={(o) =>
                   field.handleChange(
-                    fromOptionList(o, warningsQuery.data || [])
+                    fromOptionList(o, warningsQuery.data || []),
                   )
                 }
                 options={toOptionList(warningsQuery.data || [])}

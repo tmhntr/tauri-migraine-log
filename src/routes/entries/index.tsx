@@ -2,7 +2,7 @@
 import { DataTable } from "@/components/entry-table";
 
 function DataTablePage() {
-  const { data, error, isLoading } = useListEntries()
+  const { data, error, isLoading } = useListEntries();
 
   if (error) return <Navigate />;
 
@@ -21,8 +21,8 @@ function DataTablePage() {
         <div className="flex flex-col">
           {isLoading ? (
             <Loader />
-          ) :  data && (
-            <DataTable data={data} columns={defaultColumns} />
+          ) : (
+            data && <DataTable data={data} columns={defaultColumns} />
           )}
         </div>
       </div>

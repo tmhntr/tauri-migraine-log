@@ -16,7 +16,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-// interface DataTableProps<TValue> 
+// interface DataTableProps<TValue>
 // {
 //   columns: ColumnDef<EntryType, TValue>[];
 //   data: EntryType[];
@@ -51,7 +51,7 @@ export function DataTable({
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                   </TableHead>
                 );

@@ -1,1 +1,1 @@
-declare module 'react-weather-widget';
+declare module "react-weather-widget";

@@ -22,17 +22,17 @@ const Home = () => {
   const lastMonth = new Date(
     today.getFullYear(),
     today.getMonth() - 1,
-    today.getDate()
+    today.getDate(),
   );
   const lastLastMonth = new Date(
     today.getFullYear(),
     today.getMonth() - 2,
-    today.getDate()
+    today.getDate(),
   );
   const monthlyCountQuery = useGetEpisodeCount(today, lastMonth);
   const previousMonthlyCountQuery = useGetEpisodeCount(
     lastMonth,
-    lastLastMonth
+    lastLastMonth,
   );
 
   return (

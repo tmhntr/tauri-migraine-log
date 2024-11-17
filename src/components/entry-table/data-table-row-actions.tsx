@@ -12,7 +12,7 @@ import { EntryData } from "@/schema";
 import { useDeleteEntry } from "@/hooks/queries";
 
 export function DataTableRowActions({ entry }: { entry: EntryData }) {
-  const mutation = useDeleteEntry()
+  const mutation = useDeleteEntry();
 
   return (
     <DropdownMenu>
