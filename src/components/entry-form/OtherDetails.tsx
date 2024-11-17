@@ -19,6 +19,7 @@ export function OtherDetails({ form }: Props) {
             <div className="flex space-x-2 items-center">
               <Textarea
                 value={field.state.value || undefined}
+                defaultValue={undefined}
                 onChange={(e) => {
                   e.preventDefault();
                   e.stopPropagation();

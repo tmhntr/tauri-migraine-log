@@ -4,8 +4,9 @@ import { DataTableRowActions } from "./data-table-row-actions";
 import { Badge } from "../ui/badge";
 
 // Helper function to format symptoms array into a string
-const getEntrySymptoms = (entry: EntryData) => {
-  return entry.symptoms?.map(s => s.name).join(", ") || '';
+const getEntrySymptoms = (symptoms: EntryData['symptoms']) => {
+  console.log(symptoms)
+  return symptoms?.map(s => s.name).join(", ") || '';
 };
 
 export const colorCodes = (severity: EntryData["headache_severity"]) => {
@@ -30,7 +31,7 @@ const columnHelper = createColumnHelper<EntryData>();
 export const defaultColumns: ColumnDef<EntryData, any>[] = [
   columnHelper.accessor("start_time", {
     header: "Start Time",
-    cell: (props) => props.getValue() ?? "N/A"
+    cell: (props) => new Date(props.getValue()).toDateString() ?? "N/A"
   }),
   columnHelper.accessor("headache_severity", {
     header: "Severity",
@@ -41,15 +42,15 @@ export const defaultColumns: ColumnDef<EntryData, any>[] = [
       </Badge>
     ),
   }),
-  columnHelper.display({
-    id: "symptoms",
-    header: "Symptoms",
-    cell: (props) => getEntrySymptoms(props.row.original)
-  }),
+  // columnHelper.accessor('symptoms', {
+  //   id: 'symptoms',
+  //   header: "Symptoms",
+  //   cell: (props) => props.row.original.symptoms?.map(site => site.name).join(", ") ?? '...'
+  // }),
   columnHelper.display({
     id: "pain_sites",
     header: "Pain Sites",
-    cell: (props) => props.row.original.pain_sites && props.row.original.pain_sites.map(site => site.name).join(", ")
+    cell: (props) => props.row.original.pain_sites?.map(site => site.name).join(", ") ?? '...'
   }),
   columnHelper.accessor("hydration_oz", {
     header: "Hydration (oz)",

@@ -56,7 +56,7 @@
   "devDependencies": {
     "@tanstack/router-devtools": "^1.70.1",
     "@tanstack/router-plugin": "^1.69.1",
-    "@tauri-apps/cli": ">=2.0.0-rc.0",
+    "@tauri-apps/cli": "^2.1.0",
     "@types/node": "^22.7.4",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
