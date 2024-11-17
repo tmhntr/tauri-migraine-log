@@ -3,11 +3,11 @@ plugins:
   - "@semantic-release/release-notes-generator"
   - "@semantic-release/changelog"
   [
-      "semantic-release-yarn",
-      {
-        "npmPublish": false
-      }
-    ],
+    "semantic-release-yarn",
+    {
+      "npmPublish": false
+    }
+  ],
   - "@semantic-release/git"
   - "@semantic-release/github"
 
