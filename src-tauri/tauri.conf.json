@@ -1,6 +1,6 @@
 {
   "productName": "migrainelog",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "identifier": "com.migrainelog.app",
   "build": {
     "beforeDevCommand": "yarn dev",

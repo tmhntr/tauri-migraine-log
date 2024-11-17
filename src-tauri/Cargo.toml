@@ -1,8 +1,8 @@
 [package]
 name = "migrainelog"
-version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
+version = "0.2.0"
+description = "A local-first desktop application easily logging and reviewing your migraine episodes."
+authors = ["Tim Hunter"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
