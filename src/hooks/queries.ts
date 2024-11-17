@@ -282,12 +282,12 @@ export const useGetEpisodeCount = (start_date: Date, end_date: Date) => {
     queryFn: async () => {
       const db = await getDb();
       const result = await db.select<[{ count: number }]>(
-        `SELECT COUNT(*) as count 
+        `SELECT COUNT(start_time) as count 
          FROM Entry 
          WHERE start_time >= ? AND start_time <= ?`,
         [
-          start_date.toISOString().split("T")[0],
-          end_date.toISOString().split("T")[0],
+          start_date.toISOString(),
+          end_date.toISOString(),
         ],
       );
       return result[0].count;

@@ -18,22 +18,19 @@ import {
 } from "@radix-ui/react-dropdown-menu";
 import { ListFilter, File } from "lucide-react";
 const Home = () => {
-  const today = new Date();
-  const lastMonth = new Date(
-    today.getFullYear(),
-    today.getMonth() - 1,
-    today.getDate(),
-  );
-  const lastLastMonth = new Date(
-    today.getFullYear(),
-    today.getMonth() - 2,
-    today.getDate(),
-  );
-  const monthlyCountQuery = useGetEpisodeCount(today, lastMonth);
-  const previousMonthlyCountQuery = useGetEpisodeCount(
-    lastMonth,
-    lastLastMonth,
-  );
+  const [today] = React.useState(new Date());
+
+  // Calculate dates once using useMemo
+  const [currentStart, currentEnd, previousStart, previousEnd] = React.useMemo(() => {
+    const currentEnd = new Date();
+    const currentStart = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+    const previousEnd = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+    const previousStart = new Date(today.getFullYear(), today.getMonth() - 2, today.getDate());
+    return [currentStart, currentEnd, previousStart, previousEnd];
+  }, [today]);
+
+  const monthlyCountQuery = useGetEpisodeCount(currentStart, currentEnd);
+  const previousMonthlyCountQuery = useGetEpisodeCount(previousStart, previousEnd);
 
   return (
     <main className="grid flex-1 auto-rows-max items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 grid-cols-3">
@@ -127,8 +124,9 @@ const Home = () => {
                   {(() => {
                     const prevCount = previousMonthlyCountQuery.data || 0;
                     const currentCount = monthlyCountQuery.data || 0;
+                    // console.log(
+                    //   `prevCount: ${prevCount}, currentCount: ${currentCount}`,)
                     const change = currentCount - prevCount;
-                    console.log(`prev ${prevCount}, cur ${currentCount}`);
                     const percentChange =
                       prevCount !== 0
                         ? ((change / prevCount) * 100).toFixed(1)
@@ -204,6 +202,7 @@ const Home = () => {
 
 import { createFileRoute } from "@tanstack/react-router";
 import { useGetEpisodeCount } from "@/hooks/queries";
+import React from "react";
 
 export const Route = createFileRoute("/")({
   component: Home,
