@@ -111,6 +111,36 @@ export const useListEntries = () => {
     queryFn: async () => {
       const db = await getDb();
       const entries = await db.select<EntryData[]>("SELECT * FROM Entry");
+
+      for (const entry of entries) {
+        // Get related data
+        const painSites = await db.select<PainSite[]>(
+          `SELECT PainSite.* FROM PainSite 
+           JOIN PainSiteEntry ON PainSite.id = PainSiteEntry.pain_site_id 
+           WHERE PainSiteEntry.entry_id = ?`,
+          [entry.id],
+        );
+
+        const symptoms = await db.select<Symptom[]>(
+          `SELECT Symptom.* FROM Symptom
+           JOIN SymptomEntry ON Symptom.id = SymptomEntry.symptom_id
+           WHERE SymptomEntry.entry_id = ?`,
+          [entry.id],
+        );
+
+        const warnings = await db.select<Warning[]>(
+          `SELECT Warning.* FROM Warning
+           JOIN WarningEntry ON Warning.id = WarningEntry.warning_id
+           WHERE WarningEntry.entry_id = ?`,
+          [entry.id],
+        );
+
+        entry.pain_sites = painSites;
+        entry.symptoms = symptoms;
+        entry.warnings = warnings;
+      } 
+
+
       return entries;
     },
   });
@@ -229,7 +259,7 @@ export const useUpdateEntry = () => {
       warningIds,
     }: {
       id: number;
-      entry: Partial<Entry>;
+      entry: Partial<EntryData>;
       painSiteIds: number[];
       symptomIds: number[];
       warningIds: number[];
@@ -240,7 +270,7 @@ export const useUpdateEntry = () => {
       const keys = Object.keys(entry);
       const query = `UPDATE Entry SET ${keys.map((key, index) => `${key} = $${index + 1}`).join(", ")} WHERE id = $${keys.length + 1}`;
       await db.execute(query, [
-        ...keys.map((key) => entry[key as keyof Entry]),
+        ...keys.map((key) => entry[key as keyof EntryData]),
         id,
       ]);
 
