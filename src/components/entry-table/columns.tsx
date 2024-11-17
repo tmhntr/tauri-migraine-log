@@ -10,7 +10,7 @@ import { Badge } from "../ui/badge";
 // };
 
 export const colorCodes = (severity: EntryData["headache_severity"]) => {
-  if (!severity) return "";
+  if (!severity) return "hidden";
 
   switch (severity) {
     case "Extreme":
@@ -22,7 +22,7 @@ export const colorCodes = (severity: EntryData["headache_severity"]) => {
     case "Mild":
       return "bg-green-600";
     default:
-      return "";
+      return "hidden";
   }
 };
 
@@ -30,8 +30,41 @@ const columnHelper = createColumnHelper<EntryData>();
 
 export const defaultColumns: ColumnDef<EntryData, any>[] = [
   columnHelper.accessor("start_time", {
-    header: "Start Time",
+    header: "Start Date",
     cell: (props) => new Date(props.getValue()).toDateString() ?? "N/A",
+  }),
+  columnHelper.accessor("start_time", {
+    header: "Start Time",
+    cell: (props) =>
+      new Date(props.getValue()).toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      }) ?? "N/A",
+  }),
+  columnHelper.accessor("end_time", {
+    header: "End Time",
+    cell: (props) =>
+      new Date(props.getValue()).toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      }) ?? "N/A",
+  }),
+  columnHelper.display({
+    id: "duration",
+    header: "Duration",
+    cell: (props) => {
+      if (!props.row.original.start_time || !props.row.original.end_time) {
+        return "N/A";
+      }
+      const startTime = new Date(props.row.original.start_time);
+      const endTime = new Date(props.row.original.end_time);
+      const duration = endTime.getTime() - startTime.getTime();
+      const hours = Math.floor(duration / 3600000);
+      const minutes = Math.floor((duration % 3600000) / 60000);
+      return `${hours}h ${minutes}m`;
+    },
   }),
   columnHelper.accessor("headache_severity", {
     header: "Severity",
@@ -42,17 +75,42 @@ export const defaultColumns: ColumnDef<EntryData, any>[] = [
       </Badge>
     ),
   }),
-  // columnHelper.accessor('symptoms', {
-  //   id: 'symptoms',
-  //   header: "Symptoms",
-  //   cell: (props) => props.row.original.symptoms?.map(site => site.name).join(", ") ?? '...'
-  // }),
-  columnHelper.display({
-    id: "pain_sites",
+  columnHelper.accessor('symptoms',{
+    id: "symptoms",
+    header: () => "Symptoms",
+    cell: ({ row }) => {
+      return (
+        <div className="flex flex-wrap gap-1 text-muted-foreground">
+          {row.original.symptoms.map((symptom) => (
+            <Badge key={symptom.id}>{symptom.name}</Badge>
+          ))}
+        </div>
+      );
+    },
+  }),
+  columnHelper.accessor('pain_sites', {
     header: "Pain Sites",
-    cell: (props) =>
-      props.row.original.pain_sites?.map((site) => site.name).join(", ") ??
-      "...",
+    cell: ({ row }) => {
+      return (
+        <div className="flex flex-wrap gap-1 text-muted-foreground">
+          {row.original.pain_sites.map((pain_site) => (
+            <Badge key={pain_site.id}>{pain_site.name}</Badge>
+          ))}
+        </div>
+      );
+    },
+  }),
+  columnHelper.accessor('warnings',{
+    header: "Warnings",
+    cell: ({ row }) => {
+      return (
+        <div className="flex flex-wrap gap-1 text-muted-foreground">
+          {row.original.warnings.map((warning) => (
+            <Badge key={warning.id}>{warning.name}</Badge>
+          ))}
+        </div>
+      );
+    },
   }),
   columnHelper.accessor("hydration_oz", {
     header: "Hydration (oz)",

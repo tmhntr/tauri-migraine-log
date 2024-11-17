@@ -55,6 +55,43 @@ export const useWarnings = () => {
   });
 };
 
+type EntryArrayData = {
+  pain_sites: PainSite[];
+  symptoms: Symptom[];
+  warnings: Warning[]
+}
+
+const addEntryArrayData = async (entry: EntryData): Promise<EntryArrayData> => {
+  const db = await getDb();
+  const painSites = await db.select<PainSite[]>(
+    `SELECT PainSite.* FROM PainSite 
+     JOIN PainSiteEntry ON PainSite.id = PainSiteEntry.pain_site_id 
+     WHERE PainSiteEntry.entry_id = ?`,
+    [entry.id],
+  );
+
+  const symptoms = await db.select<Symptom[]>(
+    `SELECT Symptom.* FROM Symptom
+     JOIN SymptomEntry ON Symptom.id = SymptomEntry.symptom_id
+     WHERE SymptomEntry.entry_id = ?`,
+    [entry.id],
+  );
+
+  const warnings = await db.select<Warning[]>(
+    `SELECT Warning.* FROM Warning
+     JOIN WarningEntry ON Warning.id = WarningEntry.warning_id
+     WHERE WarningEntry.entry_id = ?`,
+    [entry.id],
+  );
+
+
+  return {
+    pain_sites: painSites,
+    symptoms: symptoms,
+    warnings: warnings
+  };
+}
+
 // Get Entry
 export const useGetEntry = (id: number) => {
   return useQuery({
@@ -72,34 +109,7 @@ export const useGetEntry = (id: number) => {
 
       const entry = entries[0];
 
-      // Get related data
-      const painSites = await db.select(
-        `SELECT PainSite.* FROM PainSite 
-         JOIN PainSiteEntry ON PainSite.id = PainSiteEntry.pain_site_id 
-         WHERE PainSiteEntry.entry_id = ?`,
-        [id],
-      );
-
-      const symptoms = await db.select(
-        `SELECT Symptom.* FROM Symptom
-         JOIN SymptomEntry ON Symptom.id = SymptomEntry.symptom_id
-         WHERE SymptomEntry.entry_id = ?`,
-        [id],
-      );
-
-      const warnings = await db.select(
-        `SELECT Warning.* FROM Warning
-         JOIN WarningEntry ON Warning.id = WarningEntry.warning_id
-         WHERE WarningEntry.entry_id = ?`,
-        [id],
-      );
-
-      return {
-        ...entry,
-        pain_sites: painSites,
-        symptoms,
-        warnings,
-      } as EntryData;
+      return { ...entry, ...await addEntryArrayData(entry) } as EntryData;
     },
   });
 };
@@ -114,30 +124,10 @@ export const useListEntries = () => {
 
       for (const entry of entries) {
         // Get related data
-        const painSites = await db.select<PainSite[]>(
-          `SELECT PainSite.* FROM PainSite 
-           JOIN PainSiteEntry ON PainSite.id = PainSiteEntry.pain_site_id 
-           WHERE PainSiteEntry.entry_id = ?`,
-          [entry.id],
-        );
-
-        const symptoms = await db.select<Symptom[]>(
-          `SELECT Symptom.* FROM Symptom
-           JOIN SymptomEntry ON Symptom.id = SymptomEntry.symptom_id
-           WHERE SymptomEntry.entry_id = ?`,
-          [entry.id],
-        );
-
-        const warnings = await db.select<Warning[]>(
-          `SELECT Warning.* FROM Warning
-           JOIN WarningEntry ON Warning.id = WarningEntry.warning_id
-           WHERE WarningEntry.entry_id = ?`,
-          [entry.id],
-        );
-
-        entry.pain_sites = painSites;
-        entry.symptoms = symptoms;
-        entry.warnings = warnings;
+        const arrayData = await addEntryArrayData(entry);
+        entry.pain_sites = arrayData.pain_sites;
+        entry.symptoms = arrayData.symptoms;
+        entry.warnings = arrayData.warnings
       } 
 
 
