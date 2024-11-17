@@ -51,10 +51,12 @@
     "react-weather-widget": "^1.0.1",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
-    "zod": "^3.23.8",
-    "zustand": "^5.0.0-rc.2"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/github": "^11.0.1",
     "@tanstack/router-devtools": "^1.70.1",
     "@tanstack/router-plugin": "^1.69.1",
     "@tauri-apps/cli": "^2.1.0",
@@ -64,9 +66,12 @@
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.47",
+    "prettier": "^3.2.5",
+    "semantic-release": "^24.2.0",
+    "semantic-release-cargo": "^2.3.10",
+    "semantic-release-yarn": "^3.0.2",
     "tailwindcss": "^3.4.13",
     "typescript": "^5.2.2",
-    "vite": "^5.3.1",
-    "prettier": "^3.2.5"
+    "vite": "^5.3.1"
   }
 }

@@ -4,6 +4,8 @@ plugins:
   - "@semantic-release/changelog"
   - - "semantic-release-yarn"
     - npmPublish: false
+  - - "semantic-release-cargo"
+    - publish: false
   - "@semantic-release/git"
   - "@semantic-release/github"
 
