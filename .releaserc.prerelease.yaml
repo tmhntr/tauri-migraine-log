@@ -2,18 +2,10 @@ plugins:
   - "@semantic-release/commit-analyzer"
   - "@semantic-release/release-notes-generator"
   - "@semantic-release/changelog"
-  [
-    "semantic-release-yarn",
-    {
-      "npmPublish": false
-    }
-  ],
-  [
-    "semantic-release-cargo",
-    {
-      "publish": false
-    }
-  ]
+  - - "semantic-release-yarn"
+    - npmPublish: false
+  - - "semantic-release-cargo"
+    - publish: false
   - "@semantic-release/github"
 
 branches:
