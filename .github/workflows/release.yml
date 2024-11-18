@@ -15,6 +15,7 @@ jobs:
     outputs:
       new_release_published: ${{ steps.semantic.outputs.new_release_published }}
       new_release_version: ${{ steps.semantic.outputs.new_release_version }}
+      release_version: ${{ steps.format-version.outputs.version }}
 
     steps:
       - name: Checkout
@@ -47,6 +48,19 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Format version for Tauri
+        if: steps.semantic.outputs.new_release_published == 'true'
+        id: format-version
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "version=${{ steps.semantic.outputs.new_release_version }}" >> $GITHUB_OUTPUT
+          else
+            # Remove any dev.X suffix from version and add beta
+            VERSION=${{ steps.semantic.outputs.new_release_version }}
+            CLEAN_VERSION=$(echo $VERSION | sed 's/-dev\.[0-9]*/-beta/')
+            echo "version=$CLEAN_VERSION" >> $GITHUB_OUTPUT
+          fi
+
   publish-tauri:
     needs: semantic-release
     if: needs.semantic-release.outputs.new_release_published == 'true'
@@ -69,7 +83,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Important for getting the tags
+          fetch-depth: 0
 
       - name: setup node
         uses: actions/setup-node@v4
@@ -113,9 +127,9 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
         with:
-          tagName: v${{ needs.semantic-release.outputs.new_release_version }}
-          releaseName: 'Migrainelog v${{ needs.semantic-release.outputs.new_release_version }}'
+          tagName: v${{ needs.semantic-release.outputs.release_version }}
+          releaseName: 'Migrainelog v${{ needs.semantic-release.outputs.release_version }}'
           releaseBody: 'See the assets to download this version and install.'
           releaseDraft: false
           prerelease: ${{ github.ref != 'refs/heads/main' }}
-          args: ${{ matrix.args }} 
+          args: ${{ matrix.args }}

@@ -1,10 +1,10 @@
+# For main branch releases
+branches: ['main']
 plugins:
-  - "@semantic-release/commit-analyzer"
-  - "@semantic-release/release-notes-generator"
-  - "@semantic-release/changelog"
-  - "@semantic-release/git"
-  - "@semantic-release/github"
-
-branches:
-  - "+([0-9])?(.{+([0-9]),x}).x"
-  - main
+  - '@semantic-release/commit-analyzer'
+  - '@semantic-release/release-notes-generator'
+  - '@semantic-release/changelog'
+  - '@semantic-release/github'
+  - '@semantic-release/git'
+preset: 'angular'
+tagFormat: 'v${version}'
