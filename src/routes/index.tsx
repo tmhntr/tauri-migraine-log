@@ -17,6 +17,26 @@ import {
   DropdownMenuCheckboxItem,
 } from "@radix-ui/react-dropdown-menu";
 import { ListFilter, File } from "lucide-react";
+import { useQuery } from '@tanstack/react-query';
+
+// Add this function outside of the component
+async function fetchPodcastFeed() {
+  const response = await fetch('https://feeds.captivate.fm/migraine-talks/');
+  console.log('response', response);
+  const text = await response.text();
+  console.log('text', text);
+  const parser = new DOMParser();
+  const xml = parser.parseFromString(text, 'text/xml');
+  
+  const items = xml.querySelectorAll('item');
+  return Array.from(items).map(item => ({
+    title: item.querySelector('title')?.textContent || '',
+    author: 'Migraine Canada',
+    imageUrl: xml.querySelector('image url')?.textContent || 'https://artwork.captivate.fm/e3bf6840-821c-489b-844e-2a6b98c2385b/kO_lpgIgXH9UYVIMUD_np1Qi.jpg',
+    audioUrl: item.querySelector('enclosure')?.getAttribute('url') || '',
+  }));
+}
+
 const Home = () => {
   const [today] = React.useState(new Date());
 
@@ -31,6 +51,11 @@ const Home = () => {
 
   const monthlyCountQuery = useGetEpisodeCount(currentStart, currentEnd);
   const previousMonthlyCountQuery = useGetEpisodeCount(previousStart, previousEnd);
+
+  const podcastQuery = useQuery({
+    queryKey: ['podcast-feed'],
+    queryFn: fetchPodcastFeed
+  });
 
   return (
     <main className="grid flex-1 auto-rows-max items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 grid-cols-3">
@@ -53,7 +78,7 @@ const Home = () => {
           </a>
         </CardFooter>
       </Card>
-      <Card
+      {/* <Card
         className="col-span-3 sm:col-span-1 h-full"
         x-chunk="dashboard-05-chunk-1"
       >
@@ -64,7 +89,10 @@ const Home = () => {
         <CardFooter>
           <div className="text-xs text-muted-foreground">Coming soon 👀</div>
         </CardFooter>
-      </Card>
+      </Card> */}
+      {podcastQuery.isSuccess && podcastQuery.data.length > 0 && (
+        <AudioPlayer episode={podcastQuery.data[0]} />
+      )}
       <Card
         className="col-span-3 sm:col-span-1 h-full"
         x-chunk="dashboard-05-chunk-2"
@@ -203,6 +231,7 @@ const Home = () => {
 import { createFileRoute } from "@tanstack/react-router";
 import { useGetEpisodeCount } from "@/hooks/queries";
 import React from "react";
+import AudioPlayer from "@/components/AudioPlayer";
 
 export const Route = createFileRoute("/")({
   component: Home,
