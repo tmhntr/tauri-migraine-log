@@ -8,9 +8,12 @@ import {
   Symptom,
   Warning,
 } from "../schema";
+import { invoke } from '@tauri-apps/api/core';
 
 // Database connection helper
-const getDb = async () => await Database.load("sqlite:database.sqlite");
+const getDb = async () => {
+  return await Database.load(await invoke<string>("get_db_url", {}));
+};
 
 // Query keys
 export const queryKeys = {
@@ -22,6 +25,10 @@ export const queryKeys = {
   painSitesForEntry: (entryId: number) => ["painSites", entryId] as const,
   symptomsForEntry: (entryId: number) => ["symptoms", entryId] as const,
   warningsForEntry: (entryId: number) => ["warnings", entryId] as const,
+  userLocation: (userId: number) => ["userLocation", userId] as const,
+  weather: (locationId: number, startDate: string, endDate: string) => 
+    ["weather", locationId, startDate, endDate] as const,
+  currentWeather: (locationId: number) => ["currentWeather", locationId] as const,
 };
 
 // Reference data queries
@@ -312,5 +319,146 @@ export const useGetEpisodeCount = (start_date: Date, end_date: Date) => {
       );
       return result[0].count;
     },
+  });
+};
+
+export interface UserLocation {
+  id: number;
+  user_id: number;
+  latitude: number;
+  longitude: number;
+  timezone: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WeatherData {
+  id: number;
+  date: string;
+  type: string;
+  temperature_high: number;
+  temperature_low: number;
+  surface_pressure: number;
+  precipitation: number;
+  wind_speed: number;
+  user_location_id: number;
+}
+
+export const useUserLocation = (userId: number) => {
+  return useQuery({
+    queryKey: queryKeys.userLocation(userId),
+    queryFn: async () => {
+      const db = await getDb();
+      const locations = await db.select<UserLocation[]>(
+        "SELECT * FROM UserLocation WHERE user_id = ? ORDER BY created_at DESC LIMIT 1",
+        [userId]
+      );
+      return locations[0];
+    }
+  });
+};
+
+export const useWeatherData = (locationId: number, startDate: string, endDate: string) => {
+  return useQuery({
+    queryKey: queryKeys.weather(locationId, startDate, endDate),
+    queryFn: async () => {
+      const db = await getDb();
+      return await db.select<WeatherData[]>(
+        `SELECT * FROM Weather 
+         WHERE user_location_id = ? 
+         AND date BETWEEN ? AND ?
+         ORDER BY date ASC`,
+        [locationId, startDate, endDate]
+      );
+    }
+  });
+};
+
+export const useUpdateUserLocation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ userId, latitude, longitude, timezone }: 
+      { userId: number, latitude: number, longitude: number, timezone: string }) => {
+      const db = await getDb();
+      const result = await db.execute(
+        `INSERT INTO UserLocation (user_id, latitude, longitude, timezone)
+         VALUES (?, ?, ?, ?)`,
+        [userId, latitude, longitude, timezone]
+      );
+      return result.lastInsertId;
+    },
+    onSuccess: (_, { userId }) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.userLocation(userId) });
+    }
+  });
+};
+
+export const useSyncWeatherData = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ 
+      locationId, 
+      latitude, 
+      longitude,
+      startDate,
+      endDate 
+    }: {
+      locationId: number;
+      latitude: number;
+      longitude: number;
+      startDate: string;
+      endDate: string;
+    }) => {
+      // First get existing dates
+      const db = await getDb();
+      const existingDates = await db.select<{date: string}[]>(
+        `SELECT date FROM Weather 
+         WHERE user_location_id = ? 
+         AND date BETWEEN ? AND ?`,
+        [locationId, startDate, endDate]
+      );
+
+      // Query OpenMeteo API
+      const response = await fetch(
+        `https://api.open-meteo.com/v1/forecast?` +
+        `latitude=${latitude}&longitude=${longitude}&` +
+        `daily=temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max,surface_pressure_max&` +
+        `timezone=auto&start_date=${startDate}&end_date=${endDate}`
+      );
+
+      const data = await response.json();
+
+      // Insert new weather records
+      for (let i = 0; i < data.daily.time.length; i++) {
+        const date = data.daily.time[i];
+        
+        // Skip if we already have this date
+        if (existingDates.some(ed => ed.date === date)) continue;
+
+        await db.execute(
+          `INSERT INTO Weather (
+            date, type, temperature_high, temperature_low,
+            surface_pressure, precipitation, wind_speed, user_location_id
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            date,
+            "API", // type
+            data.daily.temperature_2m_max[i],
+            data.daily.temperature_2m_min[i],
+            data.daily.surface_pressure_max[i],
+            data.daily.precipitation_sum[i],
+            data.daily.windspeed_10m_max[i],
+            locationId
+          ]
+        );
+      }
+    },
+    onSuccess: (_, { locationId, startDate, endDate }) => {
+      queryClient.invalidateQueries({ 
+        queryKey: queryKeys.weather(locationId, startDate, endDate)
+      });
+    }
   });
 };
