@@ -49,6 +49,7 @@
     "react-hook-form": "^7.53.2",
     "react-router-dom": "^6.26.2",
     "react-weather-widget": "^1.0.1",
+    "recharts": "^2.13.3",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.23.8"
