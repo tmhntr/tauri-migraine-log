@@ -55,9 +55,9 @@ jobs:
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             echo "version=${{ steps.semantic.outputs.new_release_version }}" >> $GITHUB_OUTPUT
           else
-            # Remove any dev.X suffix from version and add beta
+            # Remove any dev.X suffix
             VERSION=${{ steps.semantic.outputs.new_release_version }}
-            CLEAN_VERSION=$(echo $VERSION | sed 's/-dev\.[0-9]*/-beta/')
+            CLEAN_VERSION=$(echo $VERSION | sed 's/-dev\.[0-9]*//')
             echo "version=$CLEAN_VERSION" >> $GITHUB_OUTPUT
           fi
 
