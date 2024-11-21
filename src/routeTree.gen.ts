@@ -13,7 +13,7 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as SettingsImport } from './routes/settings'
 import { Route as EditImport } from './routes/edit'
-import { Route as CreateImport } from './routes/create'
+import { Route as CreateImport } from './routes/Create'
 import { Route as IndexImport } from './routes/index'
 import { Route as EntriesIndexImport } from './routes/entries/index'
 import { Route as EntriesEntryIdImport } from './routes/entries/$entryId'
@@ -33,8 +33,8 @@ const EditRoute = EditImport.update({
 } as any)
 
 const CreateRoute = CreateImport.update({
-  id: '/create',
-  path: '/create',
+  id: '/Create',
+  path: '/Create',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -67,10 +67,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/create': {
-      id: '/create'
-      path: '/create'
-      fullPath: '/create'
+    '/Create': {
+      id: '/Create'
+      path: '/Create'
+      fullPath: '/Create'
       preLoaderRoute: typeof CreateImport
       parentRoute: typeof rootRoute
     }
@@ -109,7 +109,7 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/create': typeof CreateRoute
+  '/Create': typeof CreateRoute
   '/edit': typeof EditRoute
   '/settings': typeof SettingsRoute
   '/entries/$entryId': typeof EntriesEntryIdRoute
@@ -118,7 +118,7 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/create': typeof CreateRoute
+  '/Create': typeof CreateRoute
   '/edit': typeof EditRoute
   '/settings': typeof SettingsRoute
   '/entries/$entryId': typeof EntriesEntryIdRoute
@@ -128,7 +128,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/create': typeof CreateRoute
+  '/Create': typeof CreateRoute
   '/edit': typeof EditRoute
   '/settings': typeof SettingsRoute
   '/entries/$entryId': typeof EntriesEntryIdRoute
@@ -139,17 +139,17 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/create'
+    | '/Create'
     | '/edit'
     | '/settings'
     | '/entries/$entryId'
     | '/entries'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/create' | '/edit' | '/settings' | '/entries/$entryId' | '/entries'
+  to: '/' | '/Create' | '/edit' | '/settings' | '/entries/$entryId' | '/entries'
   id:
     | '__root__'
     | '/'
-    | '/create'
+    | '/Create'
     | '/edit'
     | '/settings'
     | '/entries/$entryId'
@@ -186,7 +186,7 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/create",
+        "/Create",
         "/edit",
         "/settings",
         "/entries/$entryId",
@@ -196,8 +196,8 @@ export const routeTree = rootRoute
     "/": {
       "filePath": "index.tsx"
     },
-    "/create": {
-      "filePath": "create.tsx"
+    "/Create": {
+      "filePath": "Create.tsx"
     },
     "/edit": {
       "filePath": "edit.tsx"

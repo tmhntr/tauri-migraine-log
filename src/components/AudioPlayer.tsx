@@ -5,7 +5,7 @@
  */
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 
-interface PodcastEpisode {
+export interface PodcastEpisode {
   title: string;
   author: string;
   imageUrl: string;
@@ -54,7 +54,7 @@ export default function AudioPlayer({ episode }: AudioPlayerProps) {
         )}
         
         <div>
-          <audio className="w-full" src={episode.audioUrl} controls />
+          <audio data-testid="audio-player" className="w-full" src={episode.audioUrl} controls />
         </div>
       </CardContent>
     </Card>
