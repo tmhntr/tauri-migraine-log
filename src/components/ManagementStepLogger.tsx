@@ -1,6 +1,5 @@
 // import { useForm } from "react-hook-form";
 import { useForm } from "@tanstack/react-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { createManagementStepSchema, CreateManagementStep } from "../schema";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -12,13 +11,6 @@ import { useCreateManagementStep } from "@/hooks/queries";
 // import { Button, Input, Textarea } from "shadcn";
 
 const ManagementStepLogger = () => {
-  // const {
-  //     register,
-  //     handleSubmit,
-  //     formState: { errors },
-  // } = useForm<CreateManagementStep>({
-  //     resolver: zodResolver(createManagementStepSchema),
-  // });
 
   const createManagementStep = useCreateManagementStep();
 
@@ -34,12 +26,14 @@ const ManagementStepLogger = () => {
       onChange: createManagementStepSchema,
     },
     validatorAdapter: zodValidator(),
-    onSubmit: async ({ value }) => {
+    onSubmit: async ({ value, formApi }) => {
       // Do something with form data
       console.log(value);
       await createManagementStep.mutateAsync(value);
+      formApi.reset();
     },
   });
+
 
   return (
     <form
