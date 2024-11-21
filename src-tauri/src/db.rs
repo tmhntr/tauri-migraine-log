@@ -107,7 +107,7 @@ pub fn get_migrations() -> Vec<Migration> {
                 -- Add ManagementStep table
                 CREATE TABLE IF NOT EXISTS ManagementStep (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name TEXT UNIQUE NOT NULL,
+                    name TEXT NOT NULL,
                     time TEXT DEFAULT NULL,
                     amount REAL DEFAULT NULL,
                     amount_unit TEXT DEFAULT NULL,
