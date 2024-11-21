@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/tmhntr/tauri-migraine-log/compare/v1.1.0-beta...v1.1.1-beta) (2024-11-21)
+
+
+### Bug Fixes
+
+* **workflow:** update release version handling to remove dev.X suffix ([3e5893f](https://github.com/tmhntr/tauri-migraine-log/commit/3e5893f85587e7c2c201c46b7331e006de9ad0a8))
+
 # [1.1.0](https://github.com/tmhntr/tauri-migraine-log/compare/v1.0.0-beta...v1.1.0-beta) (2024-11-21)
 
 
