@@ -1,5 +1,11 @@
+import SettingsForm from "@/components/SettingsForm";
+
 const Settings = () => {
-  return <div>Settings</div>;
+  return (
+    <div>
+      <SettingsForm />
+    </div>
+  );
 };
 
 import { createFileRoute } from "@tanstack/react-router";

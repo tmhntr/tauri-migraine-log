@@ -20,23 +20,37 @@ import { ListFilter, File } from "lucide-react";
 import { WeatherWidget } from "@/components/WeatherWidget";
 import { useGeolocation } from "@/hooks/useGeolocation";
 
-
-
 const Home = () => {
   const [today] = React.useState(new Date());
   const { error: locationError } = useGeolocation();
 
   // Calculate dates once using useMemo
-  const [currentStart, currentEnd, previousStart, previousEnd] = React.useMemo(() => {
-    const currentEnd = new Date();
-    const currentStart = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
-    const previousEnd = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
-    const previousStart = new Date(today.getFullYear(), today.getMonth() - 2, today.getDate());
-    return [currentStart, currentEnd, previousStart, previousEnd];
-  }, [today]);
+  const [currentStart, currentEnd, previousStart, previousEnd] =
+    React.useMemo(() => {
+      const currentEnd = new Date();
+      const currentStart = new Date(
+        today.getFullYear(),
+        today.getMonth() - 1,
+        today.getDate()
+      );
+      const previousEnd = new Date(
+        today.getFullYear(),
+        today.getMonth() - 1,
+        today.getDate()
+      );
+      const previousStart = new Date(
+        today.getFullYear(),
+        today.getMonth() - 2,
+        today.getDate()
+      );
+      return [currentStart, currentEnd, previousStart, previousEnd];
+    }, [today]);
 
   const monthlyCountQuery = useGetEpisodeCount(currentStart, currentEnd);
-  const previousMonthlyCountQuery = useGetEpisodeCount(previousStart, previousEnd);
+  const previousMonthlyCountQuery = useGetEpisodeCount(
+    previousStart,
+    previousEnd
+  );
 
   return (
     <main className="grid flex-1 auto-rows-max items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 grid-cols-3">
@@ -66,7 +80,9 @@ const Home = () => {
         <CardHeader className="pb-2">
           <CardTitle className="text-2xl">Add Management Step</CardTitle>
         </CardHeader>
-        <CardContent><ManagementStepLogger></ManagementStepLogger></CardContent>
+        <CardContent>
+          <ManagementStepLogger></ManagementStepLogger>
+        </CardContent>
         <CardFooter>
           <div className="text-xs text-muted-foreground"></div>
         </CardFooter>
@@ -194,6 +210,9 @@ const Home = () => {
           </div>
         </TabsContent>
       </Tabs>
+      <a href="/settings">
+        <Button>Settings</Button>
+      </a>
     </main>
   );
 };
@@ -201,7 +220,6 @@ const Home = () => {
 import { createFileRoute } from "@tanstack/react-router";
 import { useGetEpisodeCount } from "@/hooks/queries";
 import React from "react";
-import AudioPlayer from "@/components/AudioPlayer";
 import PodcastPlayer from "@/components/PodcastPlayer";
 import ManagementStepLogger from "@/components/ManagementStepLogger";
 
