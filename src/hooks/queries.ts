@@ -206,7 +206,7 @@ export const useCreateManagementStep = () => {
     mutationFn: async (managementStep: CreateManagementStep) => {
       const db = await getDb();
       const result = await db.execute(
-        "INSERT INTO ManagementStep (name, time, amount, unit, notes) VALUES (?, ?, ?, ?, ?)",
+        "INSERT INTO ManagementStep (name, time, amount, amount_unit, notes) VALUES (?, ?, ?, ?, ?)",
         [managementStep.name, managementStep.time, managementStep.amount, managementStep.unit, managementStep.notes],
       );
       return result.lastInsertId;
