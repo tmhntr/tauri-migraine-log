@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/tmhntr/tauri-migraine-log/compare/v1.1.1-beta...v1.2.0-beta) (2024-11-21)
+
+
+### Features
+
+* **settings:** add SettingsForm component and integrate into Settings route ([3e7d0a3](https://github.com/tmhntr/tauri-migraine-log/commit/3e7d0a3bc1f555345f8e530cc8717979aee85c87))
+
 ## [1.1.1](https://github.com/tmhntr/tauri-migraine-log/compare/v1.1.0-beta...v1.1.1-beta) (2024-11-21)
 
 
