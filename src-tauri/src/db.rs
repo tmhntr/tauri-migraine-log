@@ -104,6 +104,26 @@ pub fn get_migrations() -> Vec<Migration> {
                     UNIQUE (entry_id, warning_id)
                 );
 
+                -- Add ManagementStep table
+                CREATE TABLE IF NOT EXISTS ManagementStep (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT UNIQUE NOT NULL,
+                    time TEXT DEFAULT NULL,
+                    amount REAL DEFAULT NULL,
+                    amount_unit TEXT DEFAULT NULL,
+                    notes TEXT DEFAULT NULL
+                );
+
+                -- Add ManagementStepEntry join table
+                CREATE TABLE IF NOT EXISTS ManagementStepEntry (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    entry_id INTEGER NOT NULL,
+                    management_step_id INTEGER NOT NULL,
+                    
+                    FOREIGN KEY (entry_id) REFERENCES Entry(id) ON DELETE CASCADE,
+                    FOREIGN KEY (management_step_id) REFERENCES ManagementStep(id) ON DELETE CASCADE
+                );
+
                 -- Create User table
                 CREATE TABLE IF NOT EXISTS User (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -169,4 +189,3 @@ pub fn get_migrations() -> Vec<Migration> {
         }
     ]
 }
-  

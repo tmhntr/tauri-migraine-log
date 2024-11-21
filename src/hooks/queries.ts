@@ -7,6 +7,8 @@ import {
   PainSite,
   Symptom,
   Warning,
+  ManagementStep,
+  CreateManagementStep,
 } from "../schema";
 import { invoke } from '@tauri-apps/api/core';
 
@@ -29,6 +31,8 @@ export const queryKeys = {
   weather: (locationId: number, startDate: string, endDate: string) => 
     ["weather", locationId, startDate, endDate] as const,
   currentWeather: (locationId: number) => ["currentWeather", locationId] as const,
+  managementSteps: ["managementSteps"] as const,
+  managementStepsForEntry: (entryId: number) => ["managementSteps", entryId] as const,
 };
 
 // Reference data queries
@@ -62,10 +66,36 @@ export const useWarnings = () => {
   });
 };
 
+export const useManagementSteps = () => {
+  return useQuery({
+    queryKey: queryKeys.managementSteps,
+    queryFn: async () => {
+      const db = await getDb();
+      return await db.select<ManagementStep[]>("SELECT * FROM ManagementStep");
+    },
+  });
+};
+
+export const useManagementStepsForEntry = (entryId: number) => {
+  return useQuery({
+    queryKey: queryKeys.managementStepsForEntry(entryId),
+    queryFn: async () => {
+      const db = await getDb();
+      return await db.select<ManagementStep[]>(
+        `SELECT ManagementStep.* FROM ManagementStep
+         JOIN ManagementStepEntry ON ManagementStep.id = ManagementStepEntry.management_step_id
+         WHERE ManagementStepEntry.entry_id = ?`,
+        [entryId],
+      );
+    },
+  });
+};
+
 type EntryArrayData = {
   pain_sites: PainSite[];
   symptoms: Symptom[];
   warnings: Warning[]
+  management_steps: ManagementStep[];
 }
 
 const addEntryArrayData = async (entry: EntryData): Promise<EntryArrayData> => {
@@ -91,11 +121,18 @@ const addEntryArrayData = async (entry: EntryData): Promise<EntryArrayData> => {
     [entry.id],
   );
 
+  const managementSteps = await db.select<ManagementStep[]>(
+    `SELECT ManagementStep.* FROM ManagementStep
+     JOIN ManagementStepEntry ON ManagementStep.id = ManagementStepEntry.management_step_id
+     WHERE ManagementStepEntry.entry_id = ?`,
+    [entry.id],
+  );
 
   return {
     pain_sites: painSites,
     symptoms: symptoms,
-    warnings: warnings
+    warnings: warnings,
+    management_steps: managementSteps,
   };
 }
 
@@ -135,6 +172,7 @@ export const useListEntries = () => {
         entry.pain_sites = arrayData.pain_sites;
         entry.symptoms = arrayData.symptoms;
         entry.warnings = arrayData.warnings
+        entry.management_steps = arrayData.management_steps;
       } 
 
 
@@ -143,7 +181,7 @@ export const useListEntries = () => {
   });
 };
 
-const useCreateWeather = () => {
+export const useCreateWeather = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -161,16 +199,42 @@ const useCreateWeather = () => {
   });
 };
 
+export const useCreateManagementStep = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (managementStep: CreateManagementStep) => {
+      const db = await getDb();
+      const result = await db.execute(
+        "INSERT INTO ManagementStep (name, time, amount, unit, notes) VALUES (?, ?, ?, ?, ?)",
+        [managementStep.name, managementStep.time, managementStep.amount, managementStep.unit, managementStep.notes],
+      );
+      return result.lastInsertId;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.managementSteps });
+    },
+  });
+};
+
 // Entry mutations
 export const useCreateEntry = () => {
   const queryClient = useQueryClient();
   const createWeather = useCreateWeather();
+  const createManagementStep = useCreateManagementStep();
 
   return useMutation({
     mutationFn: async (entry: CreateEntry) => {
       const weatherId = entry.weather
         ? await createWeather.mutateAsync(entry.weather)
         : null;
+
+      // Create management steps
+      const managementStepIds = await Promise.all(
+        entry.management_steps.map((step) => createManagementStep.mutateAsync(step)),
+      );
+
+      // Create entry
 
       const db = await getDb();
 
@@ -215,6 +279,14 @@ export const useCreateEntry = () => {
         );
       }
 
+      // Insert management step relations
+      for (const managementStep of entry.management_steps) {
+        await db.execute(
+          "INSERT INTO ManagementStepEntry (entry_id, management_step_id) VALUES (?, ?)",
+          [entryId, managementStep.id],
+        );
+      }
+
       return entryId;
     },
     onSuccess: () => {
@@ -234,6 +306,7 @@ export const useDeleteEntry = () => {
       await db.execute("DELETE FROM PainSiteEntry WHERE entry_id = ?", [id]);
       await db.execute("DELETE FROM SymptomEntry WHERE entry_id = ?", [id]);
       await db.execute("DELETE FROM WarningEntry WHERE entry_id = ?", [id]);
+      await db.execute("DELETE FROM ManagementStepEntry WHERE entry_id = ?", [id]);
 
       // Delete the entry
       await db.execute("DELETE FROM Entry WHERE id = ?", [id]);
@@ -254,12 +327,14 @@ export const useUpdateEntry = () => {
       painSiteIds,
       symptomIds,
       warningIds,
+      managementStepIds,
     }: {
       id: number;
       entry: Partial<EntryData>;
       painSiteIds: number[];
       symptomIds: number[];
       warningIds: number[];
+      managementStepIds: number[];
     }) => {
       const db = await getDb();
 
@@ -275,6 +350,7 @@ export const useUpdateEntry = () => {
       await db.execute("DELETE FROM PainSiteEntry WHERE entry_id = ?", [id]);
       await db.execute("DELETE FROM SymptomEntry WHERE entry_id = ?", [id]);
       await db.execute("DELETE FROM WarningEntry WHERE entry_id = ?", [id]);
+      await db.execute("DELETE FROM ManagementStepEntry WHERE entry_id = ?", [id]);
 
       for (const painSiteId of painSiteIds) {
         await db.execute(
@@ -294,6 +370,13 @@ export const useUpdateEntry = () => {
         await db.execute(
           "INSERT INTO WarningEntry (entry_id, warning_id) VALUES (?, ?)",
           [id, warningId],
+        );
+      }
+
+      for (const managementStepId of managementStepIds) {
+        await db.execute(
+          "INSERT INTO ManagementStepEntry (entry_id, management_step_id) VALUES (?, ?)",
+          [id, managementStepId],
         );
       }
     },

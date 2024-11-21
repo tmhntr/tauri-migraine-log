@@ -59,18 +59,18 @@ const Home = () => {
           </a>
         </CardFooter>
       </Card>
-      {/* <Card
+      <Card
         className="col-span-3 sm:col-span-1 h-full"
         x-chunk="dashboard-05-chunk-1"
       >
         <CardHeader className="pb-2">
-          <CardTitle className="text-2xl">Current status:</CardTitle>
+          <CardTitle className="text-2xl">Add Management Step</CardTitle>
         </CardHeader>
-        <CardContent></CardContent>
+        <CardContent><ManagementStepLogger></ManagementStepLogger></CardContent>
         <CardFooter>
-          <div className="text-xs text-muted-foreground">Coming soon 👀</div>
+          <div className="text-xs text-muted-foreground"></div>
         </CardFooter>
-      </Card> */}
+      </Card>
       <PodcastPlayer />
       <WeatherWidget />
       <Tabs defaultValue="week" className="col-span-3">
@@ -203,6 +203,7 @@ import { useGetEpisodeCount } from "@/hooks/queries";
 import React from "react";
 import AudioPlayer from "@/components/AudioPlayer";
 import PodcastPlayer from "@/components/PodcastPlayer";
+import ManagementStepLogger from "@/components/ManagementStepLogger";
 
 export const Route = createFileRoute("/")({
   component: Home,

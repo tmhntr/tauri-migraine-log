@@ -1,3 +1,4 @@
+import { time } from "console";
 import { z } from "zod";
 
 const symptomsSchema = z.object({
@@ -21,6 +22,15 @@ const weatherSchema = z.object({
 });
 const createWeatherSchema = weatherSchema.omit({ id: true });
 
+const managementStepSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  time: z.string().datetime(),
+  amount: z.number(),
+  unit: z.string(),
+  notes: z.string().nullable(),
+});
+
 const entrySchema = z.object({
   id: z.number(),
   start_time: z.string().datetime(),
@@ -40,14 +50,22 @@ const entrySchema = z.object({
   symptoms: z.array(symptomsSchema),
   pain_sites: z.array(painSiteSchema),
   warnings: z.array(warningSchema),
+  management_steps: z.array(managementStepSchema),
   weather: weatherSchema.nullable(),
 });
+
+managementStepSchema.extend({ entries: z.array(entrySchema).optional() });
+
+export const createManagementStepSchema = managementStepSchema.omit({ id: true });
+
 export const createEntrySchema = entrySchema
   .omit({ id: true, updated_at: true, created_at: true })
   .extend({ weather: createWeatherSchema.nullable() });
 
 export type EntryData = z.infer<typeof entrySchema>;
 export type CreateEntry = z.infer<typeof createEntrySchema>;
+export type ManagementStep = z.infer<typeof managementStepSchema>;
+export type CreateManagementStep = z.infer<typeof createManagementStepSchema>;
 export type Weather = z.infer<typeof weatherSchema>;
 export type CreateWeather = z.infer<typeof createWeatherSchema>;
 export type PainSite = z.infer<typeof painSiteSchema>;
