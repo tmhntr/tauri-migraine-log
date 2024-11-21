@@ -1,3 +1,22 @@
+# [1.1.0](https://github.com/tmhntr/tauri-migraine-log/compare/v1.0.0-beta...v1.1.0-beta) (2024-11-21)
+
+
+### Bug Fixes
+
+* **db:** remove uniqueness constraint from ManagementStep name field ([47b3529](https://github.com/tmhntr/tauri-migraine-log/commit/47b35298eceb70433f98e0980f2d8bcc1651b409))
+* **db:** update column name in ManagementStep insert query ([ddc29d9](https://github.com/tmhntr/tauri-migraine-log/commit/ddc29d97ddeb12dc969e00b098392fb31f6cb733))
+
+
+### Features
+
+* **db:** add simple database encryption ([cfb2812](https://github.com/tmhntr/tauri-migraine-log/commit/cfb2812e842317a6762b5707b34516a79657544c))
+* **management:** add management step logger module to main page ([902476f](https://github.com/tmhntr/tauri-migraine-log/commit/902476f93d5824fdbcda6444d536fca70329783b))
+* **management:** refactor ManagementStepLogger to use @tanstack/react-form and reset form on submit ([f1c8b90](https://github.com/tmhntr/tauri-migraine-log/commit/f1c8b90666f20e921761276726dd821f7f7b2a52))
+* **podcast:** Added podcast player that plays  episodes from migraine canada ([46f06cd](https://github.com/tmhntr/tauri-migraine-log/commit/46f06cd9f7120bb97bec4ede2a8eb40c4c28aecf))
+* **tests:** add Jest setup and initial tests for AudioPlayer component ([bc83a88](https://github.com/tmhntr/tauri-migraine-log/commit/bc83a88ada3ae1b86d8f673cc187875be0e1a7f5))
+* **weather:** add implementation of weather tracker ([37f0849](https://github.com/tmhntr/tauri-migraine-log/commit/37f084967c37038db08d0693811fa1c512f289d6))
+* add migraine canada podcast player module ([570953a](https://github.com/tmhntr/tauri-migraine-log/commit/570953a1838abf5be52abfe70dc79f4289d2b6d9))
+
 # 1.0.0 (2024-11-18)
 
 
