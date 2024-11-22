@@ -230,7 +230,7 @@ export const useCreateEntry = () => {
         : null;
 
       // Create management steps
-      const managementStepIds = await Promise.all(
+      await Promise.all(
         entry.management_steps.map((step) => createManagementStep.mutateAsync(step)),
       );
 

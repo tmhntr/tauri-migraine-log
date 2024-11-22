@@ -18,11 +18,11 @@ import {
 } from "@radix-ui/react-dropdown-menu";
 import { ListFilter, File } from "lucide-react";
 import { WeatherWidget } from "@/components/WeatherWidget";
-import { useGeolocation } from "@/hooks/useGeolocation";
+// import { useGeolocation } from "@/hooks/useGeolocation";
 
 const Home = () => {
   const [today] = React.useState(new Date());
-  const { error: locationError } = useGeolocation();
+  // const { error: locationError } = useGeolocation();
 
   // Calculate dates once using useMemo
   const [currentStart, currentEnd, previousStart, previousEnd] =
