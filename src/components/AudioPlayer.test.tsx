@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import AudioPlayer, { PodcastEpisode } from './AudioPlayer';
+import '@testing-library/jest-dom'
 
 test('renders AudioPlayer component', () => {
   const episode: PodcastEpisode = { title: 'Test Episode', audioUrl: 'https://example.com/test.mp3', author: 'Test Author', imageUrl: 'https://example.com/test.jpg' };
