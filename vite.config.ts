@@ -15,6 +15,15 @@ export default defineConfig(async () => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  test: {
+    // support `describe`, `test` etc. globally, 
+    // so you don't need to import them every time
+    globals: true, 
+    // run tests in jsdom environment
+    environment: "jsdom",
+    // global test setup
+    setupFiles: "./tests/setup.js",
+  },
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //
