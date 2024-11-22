@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/tmhntr/tauri-migraine-log/compare/v1.2.0...v1.3.0) (2024-11-22)
+
+
+### Features
+
+* **ci:** add build and test job to release workflow ([e0c67b8](https://github.com/tmhntr/tauri-migraine-log/commit/e0c67b8ed875404a3bccb195cdbf8e654b4ef009))
+
 # [1.2.0-beta.1](https://github.com/tmhntr/tauri-migraine-log/compare/v1.1.0-beta.1...v1.2.0-beta.1) (2024-11-22)
 
 
