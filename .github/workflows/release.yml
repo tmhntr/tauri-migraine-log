@@ -25,8 +25,8 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Build and Test
-        run: yarn build && yarn test
+      - name: Test
+        run: yarn test
 
   semantic-release:
     name: Semantic Release
