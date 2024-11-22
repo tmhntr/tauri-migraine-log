@@ -1,3 +1,10 @@
+# [1.2.0-beta.1](https://github.com/tmhntr/tauri-migraine-log/compare/v1.1.0-beta.1...v1.2.0-beta.1) (2024-11-22)
+
+
+### Bug Fixes
+
+* build errors ([dc97c08](https://github.com/tmhntr/tauri-migraine-log/commit/dc97c08439aa49b88eab05c35f6b1aec1ec45b60))
+
 # [1.1.0-beta.1](https://github.com/tmhntr/tauri-migraine-log/compare/v1.0.0...v1.1.0-beta.1) (2024-11-22)
 
 
