@@ -1,5 +1,8 @@
 # For main branch releases
-branches: ['main']
+branches:
+  - name: 'main'
+  - name: 'dev'
+    prerelease: 'beta'
 plugins:
   - '@semantic-release/commit-analyzer'
   - '@semantic-release/release-notes-generator'
