@@ -2,8 +2,6 @@
 branches:
   - name: 'main'
   - name: 'dev'
-    prerelease: 'beta'
-    tagFormat: '${version}'
 plugins:
   - '@semantic-release/commit-analyzer'
   - '@semantic-release/release-notes-generator'
