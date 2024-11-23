@@ -1,4 +1,5 @@
-import { UserForm, UserLocationForm } from "@/components/SettingsForm";
+import { UserForm, UserLocationForm } from '@/components/SettingsForm'
+import { createFileRoute } from '@tanstack/react-router'
 
 const SettingsPage = () => {
   return (
@@ -13,7 +14,9 @@ const SettingsPage = () => {
         <UserLocationForm />
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default SettingsPage;
+export const Route = createFileRoute('/settings')({
+  component: SettingsPage,
+})

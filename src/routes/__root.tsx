@@ -1,4 +1,4 @@
-import { createRootRoute, Navigate, Outlet } from "@tanstack/react-router";
+import { createRootRoute, Outlet } from "@tanstack/react-router";
 import Layout from "@/components/Layout";
 
 import { store } from "@/main";
