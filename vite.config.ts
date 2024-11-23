@@ -7,10 +7,11 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 
 // @ts-expect-error process is a nodejs global
 const host = process.env.TAURI_DEV_HOST;
+const isTest = process.env.NODE_ENV === 'test'
 
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
-  plugins: [react(), TanStackRouterVite(),tsconfigPaths(),],
+  plugins: [react(), !isTest && TanStackRouterVite(), tsconfigPaths()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -19,11 +20,18 @@ export default defineConfig(async () => ({
   test: {
     // support `describe`, `test` etc. globally, 
     // so you don't need to import them every time
-    globals: true, 
+    // globals: true, 
+    // add jest global variables
+    globals: {
+      'ts-jest': {
+        tsconfig: 'tsconfig.json',
+      },
+    },
     // run tests in jsdom environment
     environment: "jsdom",
     // global test setup
     setupFiles: "./tests/setup.js",
+    include: ["tests/**/*.test.tsx"]
   },
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
