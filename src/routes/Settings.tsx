@@ -1,15 +1,19 @@
-import SettingsForm from "@/components/SettingsForm";
+import { UserForm, UserLocationForm } from "@/components/SettingsForm";
 
-const Settings = () => {
+const SettingsPage = () => {
   return (
     <div>
-      <SettingsForm />
+      <h1>Settings</h1>
+      <div>
+        <h2>User Information</h2>
+        <UserForm />
+      </div>
+      <div>
+        <h2>Location Information</h2>
+        <UserLocationForm />
+      </div>
     </div>
   );
 };
 
-import { createFileRoute } from "@tanstack/react-router";
-
-export const Route = createFileRoute("/settings")({
-  component: Settings,
-});
+export default SettingsPage;

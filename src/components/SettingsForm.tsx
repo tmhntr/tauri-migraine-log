@@ -3,36 +3,38 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Button } from "./ui/button";
 import { zodValidator } from "@tanstack/zod-form-adapter";
-import { useUpdateUserLocation } from "@/hooks/queries";
-import { z } from "zod";
+import { useUpdateUserLocation, useUpdateUser } from "@/hooks/queries";
+import { createUserSchema, createLocationSchema, User } from "@/schema";
+import { store } from "@/main";
+import { useStore } from "@tanstack/react-store";
+import { useNavigate } from "@tanstack/react-router";
 
-const userLocationSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  latitude: z.string().min(1, "Latitude is required"),
-  longitude: z.string().min(1, "Longitude is required"),
-  timezone: z.string().min(1, "Timezone is required"),
-});
+const useUserOrNavigate = () => {
+  const user = useStore(store, (s) => s.user);
+  const navigate = useNavigate();
+  if (!user) {
+    navigate({ to: "/login" });
+  }
+  return user as User;
+};
 
-const SettingsForm = () => {
-  const updateUserLocation = useUpdateUserLocation();
+const UserForm = () => {
+  const updateUser = useUpdateUser();
+  const user = useUserOrNavigate();
+
 
   const form = useForm({
     defaultValues: {
-      name: "",
-      latitude: "",
-      longitude: "",
-      timezone: "",
+      name: user?.name,
     },
     validators: {
-      onChange: userLocationSchema,
+      onChange: createUserSchema,
     },
     validatorAdapter: zodValidator(),
     onSubmit: async ({ value, formApi }) => {
-      updateUserLocation.mutate({
-        userId: 1, // Assuming a single user for simplicity
-        latitude: parseFloat(value.latitude),
-        longitude: parseFloat(value.longitude),
-        timezone: value.timezone,
+      updateUser.mutate({
+        userId: user?.id, // Assuming a single user for simplicity
+        name: value.name,
       });
       formApi.reset();
     },
@@ -56,6 +58,70 @@ const SettingsForm = () => {
                 id="name"
                 value={field.state.value}
                 onChange={(e) => field.handleChange(e.target.value)}
+              />
+            </div>
+          )}
+        />
+      </div>
+      <Button type="submit">Save</Button>
+    </form>
+  );
+};
+
+const UserLocationForm = () => {
+  const updateUserLocation = useUpdateUserLocation();
+
+  const form = useForm({
+    defaultValues: {
+      latitude: "",
+      longitude: "",
+      timezone: "",
+      city: "",
+    },
+    validators: {
+      onChange: createLocationSchema,
+    },
+    validatorAdapter: zodValidator(),
+    onSubmit: async ({ value, formApi }) => {
+      updateUserLocation.mutate({
+        userId: 1, // Assuming a single user for simplicity
+        latitude: parseFloat(value.latitude),
+        longitude: parseFloat(value.longitude),
+        timezone: value.timezone,
+      });
+      formApi.reset();
+    },
+  });
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        form.handleSubmit();
+      }}
+    >
+      <div>
+        <Label htmlFor="city">City</Label>
+        <form.Field
+          name="city"
+          children={(field) => (
+            <div className="flex space-x-2 items-center">
+              <Input
+                value={field.state.value}
+                onChange={(e) => field.handleChange(e.target.value)}
+                placeholder="Enter city name"
+                onKeyDown={async (e) => {
+                  if (e.key === "Enter") {
+                    const response = await fetch(
+                      `http://api.openweathermap.org/geo/1.0/direct?q=${field.state.value}&appid=2abba5469d642e9c655beaaa87a929c6`
+                    );
+                    const data = await response.json();
+                    field.form.setFieldValue("latitude", data[0].lat);
+                    field.form.setFieldValue("longitude", data[0].lon);
+                    field.form.setFieldValue("timezone", data[0].timezone);
+                  }
+                }}
               />
             </div>
           )}
@@ -111,4 +177,4 @@ const SettingsForm = () => {
   );
 };
 
-export default SettingsForm;
+export { UserForm, UserLocationForm };

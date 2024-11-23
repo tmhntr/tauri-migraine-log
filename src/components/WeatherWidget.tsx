@@ -38,7 +38,7 @@ export function WeatherWidget() {
   const currentWeather = weatherData.data?.[weatherData.data.length - 1];
 
   return (
-    <Card className="col-span-3 sm:col-span-1">
+    <Card className="col-span-3 sm:col-span-1 h-full">
       <Tabs defaultValue="current">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
@@ -117,4 +117,4 @@ export function WeatherWidget() {
       </Tabs>
     </Card>
   );
-} 
+}
