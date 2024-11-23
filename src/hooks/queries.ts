@@ -9,6 +9,7 @@ import {
   Warning,
   ManagementStep,
   CreateManagementStep,
+  User,
 } from "../schema";
 import { invoke } from '@tauri-apps/api/core';
 
@@ -230,7 +231,7 @@ export const useCreateEntry = () => {
         : null;
 
       // Create management steps
-      await Promise.all(
+      const managementStepIds = await Promise.all(
         entry.management_steps.map((step) => createManagementStep.mutateAsync(step)),
       );
 
@@ -280,10 +281,10 @@ export const useCreateEntry = () => {
       }
 
       // Insert management step relations
-      for (const managementStep of entry.management_steps) {
+      for (const id of managementStepIds) {
         await db.execute(
           "INSERT INTO ManagementStepEntry (entry_id, management_step_id) VALUES (?, ?)",
-          [entryId, managementStep.id],
+          [entryId, id],
         );
       }
 
@@ -543,5 +544,65 @@ export const useSyncWeatherData = () => {
         queryKey: queryKeys.weather(locationId, startDate, endDate)
       });
     }
+  });
+};
+
+export const getUser = async (id: number) => {
+  const db = await getDb();
+  return (await db.select<User[]>("SELECT * FROM User WHERE id = ?", [id]))[0];
+}
+
+export const useListUsers = () => {
+  return useQuery({
+    queryKey: ['users'],
+    queryFn: async () => {
+      const db = await getDb();
+      return db.select<User[]>("SELECT * FROM User");
+    }
+  });
+}
+
+export const useGetUser = (id: number) => {
+  return useQuery({
+    queryKey: ['user'],
+    queryFn: async () => {
+      return getUser(id);
+    }
+  });
+}
+
+export const useCreateUser = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (name: string) => {
+      const db = await getDb();
+      const result = await db.execute(
+        "INSERT INTO User (name) VALUES (?)",
+        [name]
+      );
+      return result.lastInsertId;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user'] });
+    },
+  });
+};
+
+
+export const useUpdateUser = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ userId, name }: { userId: number; name: string }) => {
+      const db = await getDb();
+      await db.execute(
+        "UPDATE User SET name = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+        [name, userId]
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user'] });
+    },
   });
 };
