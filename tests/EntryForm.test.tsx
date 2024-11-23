@@ -1,52 +1,95 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import EntryForm from '../src/components/entry-form';
-import { expect, vi } from 'vitest';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactElement } from 'react';
-import React from 'react';
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import EntryForm from "../src/components/entry-form";
+import { Mock, vi } from "vitest";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactElement } from "react";
+import React from "react";
 
-vi.mock('@tanstack/react-router', () => ({
-  useRouter: vi.fn().mockReturnValue({
-    navigate: vi.fn(),
-  }),
-  useNavigate: vi.fn().mockReturnValue(vi.fn()),
-}));
+import { mockDatabase } from "./mocks/Database";
+import { useCreateEntry } from "../src/hooks/queries";
 
-const queryClient = new QueryClient();
-const renderWithClient = (ui: ReactElement) => {
-  return render(
-    <QueryClientProvider client={queryClient}>
-      {ui}
-    </QueryClientProvider>, {
 
-    }
-  );
-};
-
-test('renders EntryForm component', () => {
-  renderWithClient(<EntryForm />);
-  const form = screen.getByText('Start time');
-  const input_1 = screen.getByRole('textbox', { name: /title/i });
-  expect(form).toBeInTheDocument();
+vi.mock("@tanstack/react-router", () => {
+  const navigate = vi.fn();
+  return {
+    Link: vi.fn(),
+    useNavigate: () => navigate,
+  };
 });
 
-test('allows user to submit the form', async () => {
-  const user = userEvent.setup();
-  const mockCreateEntry = vi.fn().mockResolvedValue(1);
-  renderWithClient(<EntryForm />);
-  
-  await user.type(screen.getByLabelText(/title/i), 'Test Title');
-  await user.type(screen.getByLabelText(/description/i), 'Test Description');
-  await user.type(screen.getByLabelText(/date/i), '2023-10-01');
-  
-  await user.click(screen.getByText(/save entry/i));
-  
-  await waitFor(() => {
-    expect(mockCreateEntry).toHaveBeenCalledWith({
-      title: 'Test Title',
-      description: 'Test Description',
-      date: '2023-10-01'
+vi.mock("@tauri-apps/api/core", () => {
+  const invoke = vi.fn();
+  return { invoke };
+});
+
+vi.mock("../src/hooks/queries", () => {
+  const useWeather = vi.fn();
+  const mutateAsync = vi.fn().mockResolvedValue(1);
+
+  return {
+    useWeather,
+    useCreateEntry: () => ({ mutateAsync }),
+    useSymptoms: vi.fn().mockReturnValue({ data: [] }),
+    useWarnings: vi.fn().mockReturnValue({ data: [] }),
+    usePainSites: vi.fn().mockReturnValue({ data: [] }),
+  };
+});
+describe("EntryForm", () => {
+  const queryClient = new QueryClient();
+
+  const renderWithClient = (component: ReactElement) => {
+    return render(
+      <QueryClientProvider client={queryClient}>
+        {component}
+      </QueryClientProvider>
+    );
+  };
+
+  mockDatabase();
+
+  // afterEach(() => {
+  //   vi.clearAllMocks();
+  // });
+  it("submits an entry to the database with all the correct data", async () => {
+    const user = userEvent.setup();
+    renderWithClient(<EntryForm />);
+
+    const createEntry = useCreateEntry();
+
+    await user.click(screen.getByRole("tab", { name: /Basic Info/i }));
+    await user.click(screen.getAllByRole("button", { name: /now/i })[0]);
+
+    const slider = screen.getByRole("slider");
+    await user.pointer([
+      {
+        node: slider,
+      },
+      {
+        coords: { x: 0, y: 0 },
+      },
+      {
+        coords: { x: 100, y: 0 },
+      },
+    ]);
+
+    await user.click(screen.getByRole("button", { name: /next/i }));
+    await user.click(screen.getByRole("button", { name: /next/i }));
+
+    // await user.click(screen.getByRole("button", { name: /save/i }));
+    await user.click(screen.getByText(/save entry/i));
+
+    await waitFor(() => {
+      expect(createEntry.mutateAsync).toHaveBeenCalledWith(
+        expect.objectContaining({
+          headache_severity: null,
+          start_time: expect.any(String),
+          weather: null,
+          notes: "",
+          recent_duration_of_sleep: null,
+          hydration_oz: null,
+        })
+      );
     });
   });
 });

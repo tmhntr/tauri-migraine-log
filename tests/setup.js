@@ -26,3 +26,5 @@ beforeAll(() => {
 afterEach(() => {
   cleanup();
 });
+
+export { expect, React };
