@@ -123,6 +123,9 @@ jobs:
       - name: install vcpkg (windows only)
         if: runner.os == 'Windows'
         run: |
+          set VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT
+          set OPENSSL_ROOT_DIR=%VCPKG_ROOT%\installed\x64-windows
+          set OPENSSL_INCLUDE_DIR=%OPENSSL_ROOT_DIR%\include
           vcpkg install openssl:x64-windows-static-md
 
       - name: install frontend dependencies
