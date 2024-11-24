@@ -7,10 +7,16 @@ import {
   PainSite,
   Symptom,
   Warning,
+  ManagementStep,
+  CreateManagementStep,
+  User,
 } from "../schema";
+import { invoke } from "@tauri-apps/api/core";
 
 // Database connection helper
-const getDb = async () => await Database.load("sqlite:database.sqlite");
+const getDb = async () => {
+  return await Database.load(await invoke<string>("get_db_url", {}));
+};
 
 // Query keys
 export const queryKeys = {
@@ -22,6 +28,14 @@ export const queryKeys = {
   painSitesForEntry: (entryId: number) => ["painSites", entryId] as const,
   symptomsForEntry: (entryId: number) => ["symptoms", entryId] as const,
   warningsForEntry: (entryId: number) => ["warnings", entryId] as const,
+  userLocation: (userId: number) => ["userLocation", userId] as const,
+  weather: (locationId: number, startDate: string, endDate: string) =>
+    ["weather", locationId, startDate, endDate] as const,
+  currentWeather: (locationId: number) =>
+    ["currentWeather", locationId] as const,
+  managementSteps: ["managementSteps"] as const,
+  managementStepsForEntry: (entryId: number) =>
+    ["managementSteps", entryId] as const,
 };
 
 // Reference data queries
@@ -55,11 +69,37 @@ export const useWarnings = () => {
   });
 };
 
+export const useManagementSteps = () => {
+  return useQuery({
+    queryKey: queryKeys.managementSteps,
+    queryFn: async () => {
+      const db = await getDb();
+      return await db.select<ManagementStep[]>("SELECT * FROM ManagementStep");
+    },
+  });
+};
+
+export const useManagementStepsForEntry = (entryId: number) => {
+  return useQuery({
+    queryKey: queryKeys.managementStepsForEntry(entryId),
+    queryFn: async () => {
+      const db = await getDb();
+      return await db.select<ManagementStep[]>(
+        `SELECT ManagementStep.* FROM ManagementStep
+         JOIN ManagementStepEntry ON ManagementStep.id = ManagementStepEntry.management_step_id
+         WHERE ManagementStepEntry.entry_id = ?`,
+        [entryId],
+      );
+    },
+  });
+};
+
 type EntryArrayData = {
   pain_sites: PainSite[];
   symptoms: Symptom[];
-  warnings: Warning[]
-}
+  warnings: Warning[];
+  management_steps: ManagementStep[];
+};
 
 const addEntryArrayData = async (entry: EntryData): Promise<EntryArrayData> => {
   const db = await getDb();
@@ -84,13 +124,20 @@ const addEntryArrayData = async (entry: EntryData): Promise<EntryArrayData> => {
     [entry.id],
   );
 
+  const managementSteps = await db.select<ManagementStep[]>(
+    `SELECT ManagementStep.* FROM ManagementStep
+     JOIN ManagementStepEntry ON ManagementStep.id = ManagementStepEntry.management_step_id
+     WHERE ManagementStepEntry.entry_id = ?`,
+    [entry.id],
+  );
 
   return {
     pain_sites: painSites,
     symptoms: symptoms,
-    warnings: warnings
+    warnings: warnings,
+    management_steps: managementSteps,
   };
-}
+};
 
 // Get Entry
 export const useGetEntry = (id: number) => {
@@ -109,7 +156,7 @@ export const useGetEntry = (id: number) => {
 
       const entry = entries[0];
 
-      return { ...entry, ...await addEntryArrayData(entry) } as EntryData;
+      return { ...entry, ...(await addEntryArrayData(entry)) } as EntryData;
     },
   });
 };
@@ -127,16 +174,16 @@ export const useListEntries = () => {
         const arrayData = await addEntryArrayData(entry);
         entry.pain_sites = arrayData.pain_sites;
         entry.symptoms = arrayData.symptoms;
-        entry.warnings = arrayData.warnings
-      } 
-
+        entry.warnings = arrayData.warnings;
+        entry.management_steps = arrayData.management_steps;
+      }
 
       return entries;
     },
   });
 };
 
-const useCreateWeather = () => {
+export const useCreateWeather = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -154,16 +201,50 @@ const useCreateWeather = () => {
   });
 };
 
+export const useCreateManagementStep = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (managementStep: CreateManagementStep) => {
+      const db = await getDb();
+      const result = await db.execute(
+        "INSERT INTO ManagementStep (name, time, amount, amount_unit, notes) VALUES (?, ?, ?, ?, ?)",
+        [
+          managementStep.name,
+          managementStep.time,
+          managementStep.amount,
+          managementStep.unit,
+          managementStep.notes,
+        ],
+      );
+      return result.lastInsertId;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.managementSteps });
+    },
+  });
+};
+
 // Entry mutations
 export const useCreateEntry = () => {
   const queryClient = useQueryClient();
   const createWeather = useCreateWeather();
+  const createManagementStep = useCreateManagementStep();
 
   return useMutation({
     mutationFn: async (entry: CreateEntry) => {
       const weatherId = entry.weather
         ? await createWeather.mutateAsync(entry.weather)
         : null;
+
+      // Create management steps
+      const managementStepIds = await Promise.all(
+        entry.management_steps.map((step) =>
+          createManagementStep.mutateAsync(step),
+        ),
+      );
+
+      // Create entry
 
       const db = await getDb();
 
@@ -208,6 +289,14 @@ export const useCreateEntry = () => {
         );
       }
 
+      // Insert management step relations
+      for (const id of managementStepIds) {
+        await db.execute(
+          "INSERT INTO ManagementStepEntry (entry_id, management_step_id) VALUES (?, ?)",
+          [entryId, id],
+        );
+      }
+
       return entryId;
     },
     onSuccess: () => {
@@ -227,6 +316,9 @@ export const useDeleteEntry = () => {
       await db.execute("DELETE FROM PainSiteEntry WHERE entry_id = ?", [id]);
       await db.execute("DELETE FROM SymptomEntry WHERE entry_id = ?", [id]);
       await db.execute("DELETE FROM WarningEntry WHERE entry_id = ?", [id]);
+      await db.execute("DELETE FROM ManagementStepEntry WHERE entry_id = ?", [
+        id,
+      ]);
 
       // Delete the entry
       await db.execute("DELETE FROM Entry WHERE id = ?", [id]);
@@ -247,12 +339,14 @@ export const useUpdateEntry = () => {
       painSiteIds,
       symptomIds,
       warningIds,
+      managementStepIds,
     }: {
       id: number;
       entry: Partial<EntryData>;
       painSiteIds: number[];
       symptomIds: number[];
       warningIds: number[];
+      managementStepIds: number[];
     }) => {
       const db = await getDb();
 
@@ -268,6 +362,9 @@ export const useUpdateEntry = () => {
       await db.execute("DELETE FROM PainSiteEntry WHERE entry_id = ?", [id]);
       await db.execute("DELETE FROM SymptomEntry WHERE entry_id = ?", [id]);
       await db.execute("DELETE FROM WarningEntry WHERE entry_id = ?", [id]);
+      await db.execute("DELETE FROM ManagementStepEntry WHERE entry_id = ?", [
+        id,
+      ]);
 
       for (const painSiteId of painSiteIds) {
         await db.execute(
@@ -289,6 +386,13 @@ export const useUpdateEntry = () => {
           [id, warningId],
         );
       }
+
+      for (const managementStepId of managementStepIds) {
+        await db.execute(
+          "INSERT INTO ManagementStepEntry (entry_id, management_step_id) VALUES (?, ?)",
+          [id, managementStepId],
+        );
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.entries });
@@ -305,12 +409,223 @@ export const useGetEpisodeCount = (start_date: Date, end_date: Date) => {
         `SELECT COUNT(start_time) as count 
          FROM Entry 
          WHERE start_time >= ? AND start_time <= ?`,
-        [
-          start_date.toISOString(),
-          end_date.toISOString(),
-        ],
+        [start_date.toISOString(), end_date.toISOString()],
       );
       return result[0].count;
+    },
+  });
+};
+
+export interface UserLocation {
+  id: number;
+  user_id: number;
+  latitude: number;
+  longitude: number;
+  timezone: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WeatherData {
+  id: number;
+  date: string;
+  type: string;
+  temperature_high: number;
+  temperature_low: number;
+  surface_pressure: number;
+  precipitation: number;
+  wind_speed: number;
+  user_location_id: number;
+}
+
+export const useUserLocation = (userId: number) => {
+  return useQuery({
+    queryKey: queryKeys.userLocation(userId),
+    queryFn: async () => {
+      const db = await getDb();
+      const locations = await db.select<UserLocation[]>(
+        "SELECT * FROM UserLocation WHERE user_id = ? ORDER BY created_at DESC LIMIT 1",
+        [userId],
+      );
+      return locations[0];
+    },
+  });
+};
+
+export const useWeatherData = (
+  locationId: number,
+  startDate: string,
+  endDate: string,
+) => {
+  return useQuery({
+    queryKey: queryKeys.weather(locationId, startDate, endDate),
+    queryFn: async () => {
+      const db = await getDb();
+      return await db.select<WeatherData[]>(
+        `SELECT * FROM Weather 
+         WHERE user_location_id = ? 
+         AND date BETWEEN ? AND ?
+         ORDER BY date ASC`,
+        [locationId, startDate, endDate],
+      );
+    },
+  });
+};
+
+export const useUpdateUserLocation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      userId,
+      latitude,
+      longitude,
+      timezone,
+    }: {
+      userId: number;
+      latitude: number;
+      longitude: number;
+      timezone: string;
+    }) => {
+      const db = await getDb();
+      const result = await db.execute(
+        `INSERT INTO UserLocation (user_id, latitude, longitude, timezone)
+         VALUES (?, ?, ?, ?)`,
+        [userId, latitude, longitude, timezone],
+      );
+      return result.lastInsertId;
+    },
+    onSuccess: (_, { userId }) => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.userLocation(userId),
+      });
+    },
+  });
+};
+
+export const useSyncWeatherData = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      locationId,
+      latitude,
+      longitude,
+      startDate,
+      endDate,
+    }: {
+      locationId: number;
+      latitude: number;
+      longitude: number;
+      startDate: string;
+      endDate: string;
+    }) => {
+      // First get existing dates
+      const db = await getDb();
+      const existingDates = await db.select<{ date: string }[]>(
+        `SELECT date FROM Weather 
+         WHERE user_location_id = ? 
+         AND date BETWEEN ? AND ?`,
+        [locationId, startDate, endDate],
+      );
+
+      // Query OpenMeteo API
+      const response = await fetch(
+        `https://api.open-meteo.com/v1/forecast?` +
+          `latitude=${latitude}&longitude=${longitude}&` +
+          `daily=temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max,surface_pressure_max&` +
+          `timezone=auto&start_date=${startDate}&end_date=${endDate}`,
+      );
+
+      const data = await response.json();
+
+      // Insert new weather records
+      for (let i = 0; i < data.daily.time.length; i++) {
+        const date = data.daily.time[i];
+
+        // Skip if we already have this date
+        if (existingDates.some((ed) => ed.date === date)) continue;
+
+        await db.execute(
+          `INSERT INTO Weather (
+            date, type, temperature_high, temperature_low,
+            surface_pressure, precipitation, wind_speed, user_location_id
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            date,
+            "API", // type
+            data.daily.temperature_2m_max[i],
+            data.daily.temperature_2m_min[i],
+            data.daily.surface_pressure_max[i],
+            data.daily.precipitation_sum[i],
+            data.daily.windspeed_10m_max[i],
+            locationId,
+          ],
+        );
+      }
+    },
+    onSuccess: (_, { locationId, startDate, endDate }) => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.weather(locationId, startDate, endDate),
+      });
+    },
+  });
+};
+
+export const getUser = async (id: number) => {
+  const db = await getDb();
+  return (await db.select<User[]>("SELECT * FROM User WHERE id = ?", [id]))[0];
+};
+
+export const useListUsers = () => {
+  return useQuery({
+    queryKey: ["users"],
+    queryFn: async () => {
+      const db = await getDb();
+      return db.select<User[]>("SELECT * FROM User");
+    },
+  });
+};
+
+export const useGetUser = (id: number) => {
+  return useQuery({
+    queryKey: ["user"],
+    queryFn: async () => {
+      return getUser(id);
+    },
+  });
+};
+
+export const useCreateUser = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (name: string) => {
+      const db = await getDb();
+      const result = await db.execute("INSERT INTO User (name) VALUES (?)", [
+        name,
+      ]);
+      return result.lastInsertId;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+    },
+  });
+};
+
+export const useUpdateUser = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ userId, name }: { userId: number; name: string }) => {
+      const db = await getDb();
+      await db.execute(
+        "UPDATE User SET name = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+        [name, userId],
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user"] });
     },
   });
 };

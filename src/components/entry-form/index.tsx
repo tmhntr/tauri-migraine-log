@@ -9,6 +9,7 @@ import { useForm } from "@tanstack/react-form";
 import {
   CreateEntry,
   createEntrySchema,
+  ManagementStep,
   PainSite,
   Symptom,
   Warning,
@@ -35,6 +36,7 @@ export default function EntryForm() {
       recent_duration_of_sleep: null,
       warning_other: "",
       weather: null,
+      management_steps: [] as ManagementStep[],
     } as CreateEntry,
     validators: {
       onChange: createEntrySchema,
@@ -119,9 +121,6 @@ export default function EntryForm() {
                     )}
                   />
                 ) : (
-                  // <Button type="submit" disabled={createEntry.isPending}>
-                  //   {createEntry.isPending ? "Saving..." : "Save Entry"}
-                  // </Button>
                   <Button
                     type="button"
                     variant={"outline"}

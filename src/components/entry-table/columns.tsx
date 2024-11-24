@@ -75,7 +75,7 @@ export const defaultColumns: ColumnDef<EntryData, any>[] = [
       </Badge>
     ),
   }),
-  columnHelper.accessor('symptoms',{
+  columnHelper.accessor("symptoms", {
     id: "symptoms",
     header: () => "Symptoms",
     cell: ({ row }) => {
@@ -88,7 +88,7 @@ export const defaultColumns: ColumnDef<EntryData, any>[] = [
       );
     },
   }),
-  columnHelper.accessor('pain_sites', {
+  columnHelper.accessor("pain_sites", {
     header: "Pain Sites",
     cell: ({ row }) => {
       return (
@@ -100,7 +100,7 @@ export const defaultColumns: ColumnDef<EntryData, any>[] = [
       );
     },
   }),
-  columnHelper.accessor('warnings',{
+  columnHelper.accessor("warnings", {
     header: "Warnings",
     cell: ({ row }) => {
       return (

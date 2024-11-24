@@ -1,11 +1,4 @@
-import {
-  Home,
-  LineChart,
-  PanelLeft,
-  Search,
-  Settings,
-  PlusIcon,
-} from "lucide-react";
+import { Home, LineChart, PanelLeft, Settings, PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,7 +8,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   Tooltip,
@@ -25,7 +17,8 @@ import {
 } from "@/components/ui/tooltip";
 import { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-
+// import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "./ui/breadcrumb";
+import { SmartBreadcrumb } from "./SmartBreadcrumb";
 // export const description =
 //   "An orders dashboard with a sidebar navigation. The sidebar has icon navigation. The content area has a breadcrumb and search in the header. The main area has a list of recent orders with a filter and export button. The main area also has a detailed view of a single order with order details, shipping information, billing information, customer information, and payment information.";
 
@@ -136,6 +129,7 @@ const Layout = ({ children }: Props) => {
               </nav>
             </SheetContent>
           </Sheet>
+          <SmartBreadcrumb />
           {/* <Breadcrumb className="hidden md:flex">
             <BreadcrumbList>
               <BreadcrumbItem>
@@ -155,14 +149,14 @@ const Layout = ({ children }: Props) => {
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb> */}
-          <div className="relative ml-auto flex-1 md:grow-0 hidden sm:flex">
+          {/* <div className="relative ml-auto flex-1 md:grow-0 hidden sm:flex">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
               placeholder="Search..."
               className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]"
             />
-          </div>
+          </div> */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button

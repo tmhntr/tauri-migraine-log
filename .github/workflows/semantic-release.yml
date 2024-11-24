@@ -3,8 +3,9 @@ name: Semantic Release
 on:
   push:
     branches:
-      - main
-      - dev
+      - 'none'
+      # - main
+      # - dev
       # - feature/*
       # - hotfix/*
 
@@ -27,6 +28,10 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: "lts/*"
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
 
       - name: Prepare prerelease semantic
         if: github.ref != 'refs/heads/main'

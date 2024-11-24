@@ -4,6 +4,8 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { routeTree } from "./routeTree.gen";
+import { Store } from "@tanstack/store";
+import { User } from "./schema";
 
 // Create a new router instance
 const router = createRouter({ routeTree, basepath: "/" });
@@ -16,6 +18,10 @@ declare module "@tanstack/react-router" {
     router: typeof router;
   }
 }
+
+export const store = new Store({
+  user: null as User | null,
+});
 
 // Render the app
 const rootElement = document.getElementById("root")!;

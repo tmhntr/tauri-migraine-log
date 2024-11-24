@@ -2,6 +2,14 @@ use tauri_plugin_sql::{Migration, MigrationKind};
 
 pub fn get_migrations() -> Vec<Migration> {
     vec![
+        // Migration {
+        //     version: 1,
+        //     description: "add_password",
+        //     sql: "
+        //         PRAGMA key = 'secretkey';
+        //         ",
+        //     kind: MigrationKind::Up,
+        // },
         Migration {
             version: 1,
             description: "create_normalized_tables",
@@ -68,7 +76,14 @@ pub fn get_migrations() -> Vec<Migration> {
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     type TEXT NOT NULL,
                     temperature_high INTEGER DEFAULT NULL,
-                    temperature_low INTEGER DEFAULT NULL
+                    temperature_low INTEGER DEFAULT NULL,
+                    date DATE,
+                    surface_pressure REAL,
+                    precipitation REAL,
+                    wind_speed REAL,
+                    user_location_id INTEGER,
+                    
+                    FOREIGN KEY (user_location_id) REFERENCES UserLocation(id) ON DELETE CASCADE
                 );
 
                 -- Add Warning table
@@ -88,6 +103,61 @@ pub fn get_migrations() -> Vec<Migration> {
                     
                     UNIQUE (entry_id, warning_id)
                 );
+
+                -- Add ManagementStep table
+                CREATE TABLE IF NOT EXISTS ManagementStep (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    time TEXT DEFAULT NULL,
+                    amount REAL DEFAULT NULL,
+                    amount_unit TEXT DEFAULT NULL,
+                    notes TEXT DEFAULT NULL
+                );
+
+                -- Add ManagementStepEntry join table
+                CREATE TABLE IF NOT EXISTS ManagementStepEntry (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    entry_id INTEGER NOT NULL,
+                    management_step_id INTEGER NOT NULL,
+                    
+                    FOREIGN KEY (entry_id) REFERENCES Entry(id) ON DELETE CASCADE,
+                    FOREIGN KEY (management_step_id) REFERENCES ManagementStep(id) ON DELETE CASCADE
+                );
+
+                -- Create User table
+                CREATE TABLE IF NOT EXISTS User (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                );
+
+                CREATE TRIGGER IF NOT EXISTS update_User_updated_at
+                AFTER UPDATE ON User
+                FOR EACH ROW
+                BEGIN
+                    UPDATE User SET updated_at = CURRENT_TIMESTAMP WHERE id = OLD.id;
+                END;
+
+                -- Create UserLocation table
+                CREATE TABLE IF NOT EXISTS UserLocation (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    latitude REAL NOT NULL,
+                    longitude REAL NOT NULL,
+                    timezone TEXT NOT NULL,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    
+                    FOREIGN KEY (user_id) REFERENCES User(id) ON DELETE CASCADE
+                );
+
+                CREATE TRIGGER IF NOT EXISTS update_UserLocation_updated_at
+                AFTER UPDATE ON UserLocation
+                FOR EACH ROW
+                BEGIN
+                    UPDATE UserLocation SET updated_at = CURRENT_TIMESTAMP WHERE id = OLD.id;
+                END;
 
                 -- Insert initial data
                 INSERT INTO PainSite (name) VALUES 
@@ -119,4 +189,3 @@ pub fn get_migrations() -> Vec<Migration> {
         }
     ]
 }
-  
