@@ -22,7 +22,6 @@ const UserForm = () => {
   const updateUser = useUpdateUser();
   const user = useUserOrNavigate();
 
-
   const form = useForm({
     defaultValues: {
       name: user?.name,
@@ -114,7 +113,7 @@ const UserLocationForm = () => {
                 onKeyDown={async (e) => {
                   if (e.key === "Enter") {
                     const response = await fetch(
-                      `http://api.openweathermap.org/geo/1.0/direct?q=${field.state.value}&appid=2abba5469d642e9c655beaaa87a929c6`
+                      `http://api.openweathermap.org/geo/1.0/direct?q=${field.state.value}&appid=2abba5469d642e9c655beaaa87a929c6`,
                     );
                     const data = await response.json();
                     field.form.setFieldValue("latitude", data[0].lat);

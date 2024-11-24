@@ -11,7 +11,7 @@ import {
   CreateManagementStep,
   User,
 } from "../schema";
-import { invoke } from '@tauri-apps/api/core';
+import { invoke } from "@tauri-apps/api/core";
 
 // Database connection helper
 const getDb = async () => {
@@ -29,11 +29,13 @@ export const queryKeys = {
   symptomsForEntry: (entryId: number) => ["symptoms", entryId] as const,
   warningsForEntry: (entryId: number) => ["warnings", entryId] as const,
   userLocation: (userId: number) => ["userLocation", userId] as const,
-  weather: (locationId: number, startDate: string, endDate: string) => 
+  weather: (locationId: number, startDate: string, endDate: string) =>
     ["weather", locationId, startDate, endDate] as const,
-  currentWeather: (locationId: number) => ["currentWeather", locationId] as const,
+  currentWeather: (locationId: number) =>
+    ["currentWeather", locationId] as const,
   managementSteps: ["managementSteps"] as const,
-  managementStepsForEntry: (entryId: number) => ["managementSteps", entryId] as const,
+  managementStepsForEntry: (entryId: number) =>
+    ["managementSteps", entryId] as const,
 };
 
 // Reference data queries
@@ -95,9 +97,9 @@ export const useManagementStepsForEntry = (entryId: number) => {
 type EntryArrayData = {
   pain_sites: PainSite[];
   symptoms: Symptom[];
-  warnings: Warning[]
+  warnings: Warning[];
   management_steps: ManagementStep[];
-}
+};
 
 const addEntryArrayData = async (entry: EntryData): Promise<EntryArrayData> => {
   const db = await getDb();
@@ -135,7 +137,7 @@ const addEntryArrayData = async (entry: EntryData): Promise<EntryArrayData> => {
     warnings: warnings,
     management_steps: managementSteps,
   };
-}
+};
 
 // Get Entry
 export const useGetEntry = (id: number) => {
@@ -154,7 +156,7 @@ export const useGetEntry = (id: number) => {
 
       const entry = entries[0];
 
-      return { ...entry, ...await addEntryArrayData(entry) } as EntryData;
+      return { ...entry, ...(await addEntryArrayData(entry)) } as EntryData;
     },
   });
 };
@@ -172,10 +174,9 @@ export const useListEntries = () => {
         const arrayData = await addEntryArrayData(entry);
         entry.pain_sites = arrayData.pain_sites;
         entry.symptoms = arrayData.symptoms;
-        entry.warnings = arrayData.warnings
+        entry.warnings = arrayData.warnings;
         entry.management_steps = arrayData.management_steps;
-      } 
-
+      }
 
       return entries;
     },
@@ -208,7 +209,13 @@ export const useCreateManagementStep = () => {
       const db = await getDb();
       const result = await db.execute(
         "INSERT INTO ManagementStep (name, time, amount, amount_unit, notes) VALUES (?, ?, ?, ?, ?)",
-        [managementStep.name, managementStep.time, managementStep.amount, managementStep.unit, managementStep.notes],
+        [
+          managementStep.name,
+          managementStep.time,
+          managementStep.amount,
+          managementStep.unit,
+          managementStep.notes,
+        ],
       );
       return result.lastInsertId;
     },
@@ -232,7 +239,9 @@ export const useCreateEntry = () => {
 
       // Create management steps
       const managementStepIds = await Promise.all(
-        entry.management_steps.map((step) => createManagementStep.mutateAsync(step)),
+        entry.management_steps.map((step) =>
+          createManagementStep.mutateAsync(step),
+        ),
       );
 
       // Create entry
@@ -307,7 +316,9 @@ export const useDeleteEntry = () => {
       await db.execute("DELETE FROM PainSiteEntry WHERE entry_id = ?", [id]);
       await db.execute("DELETE FROM SymptomEntry WHERE entry_id = ?", [id]);
       await db.execute("DELETE FROM WarningEntry WHERE entry_id = ?", [id]);
-      await db.execute("DELETE FROM ManagementStepEntry WHERE entry_id = ?", [id]);
+      await db.execute("DELETE FROM ManagementStepEntry WHERE entry_id = ?", [
+        id,
+      ]);
 
       // Delete the entry
       await db.execute("DELETE FROM Entry WHERE id = ?", [id]);
@@ -351,7 +362,9 @@ export const useUpdateEntry = () => {
       await db.execute("DELETE FROM PainSiteEntry WHERE entry_id = ?", [id]);
       await db.execute("DELETE FROM SymptomEntry WHERE entry_id = ?", [id]);
       await db.execute("DELETE FROM WarningEntry WHERE entry_id = ?", [id]);
-      await db.execute("DELETE FROM ManagementStepEntry WHERE entry_id = ?", [id]);
+      await db.execute("DELETE FROM ManagementStepEntry WHERE entry_id = ?", [
+        id,
+      ]);
 
       for (const painSiteId of painSiteIds) {
         await db.execute(
@@ -396,10 +409,7 @@ export const useGetEpisodeCount = (start_date: Date, end_date: Date) => {
         `SELECT COUNT(start_time) as count 
          FROM Entry 
          WHERE start_time >= ? AND start_time <= ?`,
-        [
-          start_date.toISOString(),
-          end_date.toISOString(),
-        ],
+        [start_date.toISOString(), end_date.toISOString()],
       );
       return result[0].count;
     },
@@ -435,14 +445,18 @@ export const useUserLocation = (userId: number) => {
       const db = await getDb();
       const locations = await db.select<UserLocation[]>(
         "SELECT * FROM UserLocation WHERE user_id = ? ORDER BY created_at DESC LIMIT 1",
-        [userId]
+        [userId],
       );
       return locations[0];
-    }
+    },
   });
 };
 
-export const useWeatherData = (locationId: number, startDate: string, endDate: string) => {
+export const useWeatherData = (
+  locationId: number,
+  startDate: string,
+  endDate: string,
+) => {
   return useQuery({
     queryKey: queryKeys.weather(locationId, startDate, endDate),
     queryFn: async () => {
@@ -452,9 +466,9 @@ export const useWeatherData = (locationId: number, startDate: string, endDate: s
          WHERE user_location_id = ? 
          AND date BETWEEN ? AND ?
          ORDER BY date ASC`,
-        [locationId, startDate, endDate]
+        [locationId, startDate, endDate],
       );
-    }
+    },
   });
 };
 
@@ -462,19 +476,30 @@ export const useUpdateUserLocation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ userId, latitude, longitude, timezone }: 
-      { userId: number, latitude: number, longitude: number, timezone: string }) => {
+    mutationFn: async ({
+      userId,
+      latitude,
+      longitude,
+      timezone,
+    }: {
+      userId: number;
+      latitude: number;
+      longitude: number;
+      timezone: string;
+    }) => {
       const db = await getDb();
       const result = await db.execute(
         `INSERT INTO UserLocation (user_id, latitude, longitude, timezone)
          VALUES (?, ?, ?, ?)`,
-        [userId, latitude, longitude, timezone]
+        [userId, latitude, longitude, timezone],
       );
       return result.lastInsertId;
     },
     onSuccess: (_, { userId }) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.userLocation(userId) });
-    }
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.userLocation(userId),
+      });
+    },
   });
 };
 
@@ -482,12 +507,12 @@ export const useSyncWeatherData = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ 
-      locationId, 
-      latitude, 
+    mutationFn: async ({
+      locationId,
+      latitude,
       longitude,
       startDate,
-      endDate 
+      endDate,
     }: {
       locationId: number;
       latitude: number;
@@ -497,19 +522,19 @@ export const useSyncWeatherData = () => {
     }) => {
       // First get existing dates
       const db = await getDb();
-      const existingDates = await db.select<{date: string}[]>(
+      const existingDates = await db.select<{ date: string }[]>(
         `SELECT date FROM Weather 
          WHERE user_location_id = ? 
          AND date BETWEEN ? AND ?`,
-        [locationId, startDate, endDate]
+        [locationId, startDate, endDate],
       );
 
       // Query OpenMeteo API
       const response = await fetch(
         `https://api.open-meteo.com/v1/forecast?` +
-        `latitude=${latitude}&longitude=${longitude}&` +
-        `daily=temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max,surface_pressure_max&` +
-        `timezone=auto&start_date=${startDate}&end_date=${endDate}`
+          `latitude=${latitude}&longitude=${longitude}&` +
+          `daily=temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max,surface_pressure_max&` +
+          `timezone=auto&start_date=${startDate}&end_date=${endDate}`,
       );
 
       const data = await response.json();
@@ -517,9 +542,9 @@ export const useSyncWeatherData = () => {
       // Insert new weather records
       for (let i = 0; i < data.daily.time.length; i++) {
         const date = data.daily.time[i];
-        
+
         // Skip if we already have this date
-        if (existingDates.some(ed => ed.date === date)) continue;
+        if (existingDates.some((ed) => ed.date === date)) continue;
 
         await db.execute(
           `INSERT INTO Weather (
@@ -534,42 +559,42 @@ export const useSyncWeatherData = () => {
             data.daily.surface_pressure_max[i],
             data.daily.precipitation_sum[i],
             data.daily.windspeed_10m_max[i],
-            locationId
-          ]
+            locationId,
+          ],
         );
       }
     },
     onSuccess: (_, { locationId, startDate, endDate }) => {
-      queryClient.invalidateQueries({ 
-        queryKey: queryKeys.weather(locationId, startDate, endDate)
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.weather(locationId, startDate, endDate),
       });
-    }
+    },
   });
 };
 
 export const getUser = async (id: number) => {
   const db = await getDb();
   return (await db.select<User[]>("SELECT * FROM User WHERE id = ?", [id]))[0];
-}
+};
 
 export const useListUsers = () => {
   return useQuery({
-    queryKey: ['users'],
+    queryKey: ["users"],
     queryFn: async () => {
       const db = await getDb();
       return db.select<User[]>("SELECT * FROM User");
-    }
+    },
   });
-}
+};
 
 export const useGetUser = (id: number) => {
   return useQuery({
-    queryKey: ['user'],
+    queryKey: ["user"],
     queryFn: async () => {
       return getUser(id);
-    }
+    },
   });
-}
+};
 
 export const useCreateUser = () => {
   const queryClient = useQueryClient();
@@ -577,18 +602,16 @@ export const useCreateUser = () => {
   return useMutation({
     mutationFn: async (name: string) => {
       const db = await getDb();
-      const result = await db.execute(
-        "INSERT INTO User (name) VALUES (?)",
-        [name]
-      );
+      const result = await db.execute("INSERT INTO User (name) VALUES (?)", [
+        name,
+      ]);
       return result.lastInsertId;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user'] });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
     },
   });
 };
-
 
 export const useUpdateUser = () => {
   const queryClient = useQueryClient();
@@ -598,11 +621,11 @@ export const useUpdateUser = () => {
       const db = await getDb();
       await db.execute(
         "UPDATE User SET name = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
-        [name, userId]
+        [name, userId],
       );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user'] });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
     },
   });
 };

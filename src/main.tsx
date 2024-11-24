@@ -21,9 +21,7 @@ declare module "@tanstack/react-router" {
 
 export const store = new Store({
   user: null as User | null,
-}, );
-
-
+});
 
 // Render the app
 const rootElement = document.getElementById("root")!;

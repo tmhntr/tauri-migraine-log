@@ -22,17 +22,17 @@ const Home = () => {
       const currentStart = new Date(
         today.getFullYear(),
         today.getMonth() - 1,
-        today.getDate()
+        today.getDate(),
       );
       const previousEnd = new Date(
         today.getFullYear(),
         today.getMonth() - 1,
-        today.getDate()
+        today.getDate(),
       );
       const previousStart = new Date(
         today.getFullYear(),
         today.getMonth() - 2,
-        today.getDate()
+        today.getDate(),
       );
       return [currentStart, currentEnd, previousStart, previousEnd];
     }, [today]);
@@ -40,7 +40,7 @@ const Home = () => {
   const monthlyCountQuery = useGetEpisodeCount(currentStart, currentEnd);
   const previousMonthlyCountQuery = useGetEpisodeCount(
     previousStart,
-    previousEnd
+    previousEnd,
   );
 
   return (

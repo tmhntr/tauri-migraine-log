@@ -11,9 +11,7 @@ export const Route = createRootRoute({
 
     return (
       <>
-        <Layout>
-          {!user ? <Login /> : <Outlet />}
-        </Layout>
+        <Layout>{!user ? <Login /> : <Outlet />}</Layout>
       </>
     );
   },

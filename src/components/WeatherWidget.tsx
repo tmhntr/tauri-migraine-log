@@ -1,8 +1,25 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useUserLocation, useWeatherData, useSyncWeatherData } from "@/hooks/queries";
+import {
+  useUserLocation,
+  useWeatherData,
+  useSyncWeatherData,
+} from "@/hooks/queries";
 import { format, subDays } from "date-fns";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import { Cloud, Droplets, Wind, ArrowDown, ArrowUp, Gauge } from "lucide-react";
 import { useEffect } from "react";
 
@@ -13,13 +30,13 @@ export function WeatherWidget() {
   const location = useUserLocation(TEMP_USER_ID);
   const today = new Date();
   const thirtyDaysAgo = subDays(today, 30);
-  
+
   const weatherData = useWeatherData(
     location.data?.id ?? 0,
-    format(thirtyDaysAgo, 'yyyy-MM-dd'),
-    format(today, 'yyyy-MM-dd')
+    format(thirtyDaysAgo, "yyyy-MM-dd"),
+    format(today, "yyyy-MM-dd"),
   );
-  
+
   const syncWeather = useSyncWeatherData();
 
   // Sync weather data when location is available
@@ -29,8 +46,8 @@ export function WeatherWidget() {
         locationId: location.data.id,
         latitude: location.data.latitude,
         longitude: location.data.longitude,
-        startDate: format(thirtyDaysAgo, 'yyyy-MM-dd'),
-        endDate: format(today, 'yyyy-MM-dd')
+        startDate: format(thirtyDaysAgo, "yyyy-MM-dd"),
+        endDate: format(today, "yyyy-MM-dd"),
       });
     }
   }, [location.data]);
@@ -52,7 +69,7 @@ export function WeatherWidget() {
             Local weather conditions that might affect your migraines
           </CardDescription>
         </CardHeader>
-        
+
         <CardContent>
           <TabsContent value="current" className="space-y-4">
             {currentWeather ? (
@@ -95,18 +112,20 @@ export function WeatherWidget() {
             {weatherData.data && (
               <ResponsiveContainer width="100%" height={200}>
                 <LineChart data={weatherData.data}>
-                  <XAxis 
-                    dataKey="date" 
-                    tickFormatter={(date) => format(new Date(date), 'dd/MM')}
+                  <XAxis
+                    dataKey="date"
+                    tickFormatter={(date) => format(new Date(date), "dd/MM")}
                   />
                   <YAxis />
-                  <Tooltip 
-                    labelFormatter={(date) => format(new Date(date), 'dd MMM yyyy')}
+                  <Tooltip
+                    labelFormatter={(date) =>
+                      format(new Date(date), "dd MMM yyyy")
+                    }
                   />
-                  <Line 
-                    type="monotone" 
-                    dataKey="surface_pressure" 
-                    stroke="#8884d8" 
+                  <Line
+                    type="monotone"
+                    dataKey="surface_pressure"
+                    stroke="#8884d8"
                     name="Pressure (hPa)"
                   />
                 </LineChart>

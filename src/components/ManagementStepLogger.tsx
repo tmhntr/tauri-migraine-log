@@ -8,11 +8,16 @@ import { Button } from "./ui/button";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { DateTimePicker } from "./ui/datetime-picker";
 import { useCreateManagementStep } from "@/hooks/queries";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
 // import { Button, Input, Textarea } from "shadcn";
 
 const ManagementStepLogger = () => {
-
   const createManagementStep = useCreateManagementStep();
 
   const form = useForm({
@@ -35,20 +40,19 @@ const ManagementStepLogger = () => {
     },
   });
 
-
   return (
     <Card className="col-span-3 sm:col-span-1 h-full">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            form.handleSubmit();
-          }}
-        >
-      <CardHeader className="pb-2">
-            <CardTitle className="text-2xl">Add Management Step</CardTitle>
-          </CardHeader>
-      <CardContent>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          form.handleSubmit();
+        }}
+      >
+        <CardHeader className="pb-2">
+          <CardTitle className="text-2xl">Add Management Step</CardTitle>
+        </CardHeader>
+        <CardContent>
           <div>
             <Label htmlFor="name">Name</Label>
             <form.Field
@@ -75,7 +79,9 @@ const ManagementStepLogger = () => {
                     className="w-min"
                     hourCycle={12}
                     value={
-                      field.state.value ? new Date(field.state.value) : undefined
+                      field.state.value
+                        ? new Date(field.state.value)
+                        : undefined
                     }
                     onChange={(e) => e && field.handleChange(e.toISOString())}
                   />
@@ -129,12 +135,11 @@ const ManagementStepLogger = () => {
               )}
             />
           </div>
-
-      </CardContent>
-      <CardFooter className="flex justify-end">
+        </CardContent>
+        <CardFooter className="flex justify-end">
           <Button type="submit">Submit</Button>
-      </CardFooter>
-        </form>
+        </CardFooter>
+      </form>
     </Card>
   );
 };

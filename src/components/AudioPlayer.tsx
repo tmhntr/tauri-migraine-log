@@ -3,7 +3,7 @@
  * @see https://v0.dev/t/UHarD6QWOMa
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 export interface PodcastEpisode {
   title: string;
@@ -38,7 +38,9 @@ export default function AudioPlayer({ episode }: AudioPlayerProps) {
           </div>
           <div className="grid gap-1">
             <h1 className="text-lg font-semibold">{episode.title}</h1>
-            <h2 className="text-sm text-gray-500 dark:text-gray-400">{episode.author}</h2>
+            <h2 className="text-sm text-gray-500 dark:text-gray-400">
+              {episode.author}
+            </h2>
             {episode.publishDate && (
               <p className="text-sm text-muted-foreground">
                 {new Date(episode.publishDate).toLocaleDateString()}
@@ -46,17 +48,22 @@ export default function AudioPlayer({ episode }: AudioPlayerProps) {
             )}
           </div>
         </div>
-        
+
         {episode.description && (
           <p className="text-sm text-muted-foreground">
-            {episode.description.replace(/<[^>]*>/g, '')}
+            {episode.description.replace(/<[^>]*>/g, "")}
           </p>
         )}
-        
+
         <div>
-          <audio data-testid="audio-player" className="w-full" src={episode.audioUrl} controls />
+          <audio
+            data-testid="audio-player"
+            className="w-full"
+            src={episode.audioUrl}
+            controls
+          />
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

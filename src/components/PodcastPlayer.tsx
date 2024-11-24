@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import AudioPlayer from './AudioPlayer';
-import { Card, CardContent } from './ui/card';
-import { Button } from './ui/button';
-import { ChevronLeft } from 'lucide-react'; // Make sure to install lucide-react
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import AudioPlayer from "./AudioPlayer";
+import { Card, CardContent } from "./ui/card";
+import { Button } from "./ui/button";
+import { ChevronLeft } from "lucide-react"; // Make sure to install lucide-react
 
 interface PodcastEpisode {
   title: string;
@@ -15,25 +15,30 @@ interface PodcastEpisode {
 }
 
 async function fetchPodcastFeed() {
-  const response = await fetch('https://feeds.captivate.fm/migraine-talks/');
+  const response = await fetch("https://feeds.captivate.fm/migraine-talks/");
   const text = await response.text();
   const parser = new DOMParser();
-  const xml = parser.parseFromString(text, 'text/xml');
-  
-  const items = xml.querySelectorAll('item');
-  return Array.from(items).map(item => ({
-    title: item.querySelector('title')?.textContent || '',
-    author: 'Migraine Canada',
-    imageUrl: xml.querySelector('image url')?.textContent || 'https://artwork.captivate.fm/e3bf6840-821c-489b-844e-2a6b98c2385b/kO_lpgIgXH9UYVIMUD_np1Qi.jpg',
-    audioUrl: item.querySelector('enclosure')?.getAttribute('url') || '',
-    description: item.querySelector('description')?.textContent || '',
-    publishDate: item.querySelector('pubDate')?.textContent || '',
+  const xml = parser.parseFromString(text, "text/xml");
+
+  const items = xml.querySelectorAll("item");
+  return Array.from(items).map((item) => ({
+    title: item.querySelector("title")?.textContent || "",
+    author: "Migraine Canada",
+    imageUrl:
+      xml.querySelector("image url")?.textContent ||
+      "https://artwork.captivate.fm/e3bf6840-821c-489b-844e-2a6b98c2385b/kO_lpgIgXH9UYVIMUD_np1Qi.jpg",
+    audioUrl: item.querySelector("enclosure")?.getAttribute("url") || "",
+    description: item.querySelector("description")?.textContent || "",
+    publishDate: item.querySelector("pubDate")?.textContent || "",
   }));
 }
 
-function EpisodeList({ episodes, onEpisodeSelect }: { 
-  episodes: PodcastEpisode[], 
-  onEpisodeSelect: (episode: PodcastEpisode) => void 
+function EpisodeList({
+  episodes,
+  onEpisodeSelect,
+}: {
+  episodes: PodcastEpisode[];
+  onEpisodeSelect: (episode: PodcastEpisode) => void;
 }) {
   return (
     <Card className="col-span-3 sm:col-span-1 h-full">
@@ -53,7 +58,9 @@ function EpisodeList({ episodes, onEpisodeSelect }: {
               />
               <div className="min-w-0">
                 <h3 className="font-medium truncate">{episode.title}</h3>
-                <p className="text-sm text-muted-foreground">{episode.author}</p>
+                <p className="text-sm text-muted-foreground">
+                  {episode.author}
+                </p>
               </div>
             </div>
           ))}
@@ -64,12 +71,18 @@ function EpisodeList({ episodes, onEpisodeSelect }: {
 }
 
 export default function PodcastPlayer() {
-  const [selectedEpisode, setSelectedEpisode] = useState<PodcastEpisode | null>(null);
+  const [selectedEpisode, setSelectedEpisode] = useState<PodcastEpisode | null>(
+    null,
+  );
   const [showList, setShowList] = useState(true);
 
-  const { data: episodes, isLoading, isError } = useQuery<PodcastEpisode[]>({
-    queryKey: ['podcast-feed'],
-    queryFn: fetchPodcastFeed
+  const {
+    data: episodes,
+    isLoading,
+    isError,
+  } = useQuery<PodcastEpisode[]>({
+    queryKey: ["podcast-feed"],
+    queryFn: fetchPodcastFeed,
   });
 
   if (isLoading) {
@@ -110,11 +123,14 @@ export default function PodcastPlayer() {
   return (
     <div className="h-[600px]">
       {showList ? (
-        <EpisodeList episodes={episodes} onEpisodeSelect={handleEpisodeSelect} />
+        <EpisodeList
+          episodes={episodes}
+          onEpisodeSelect={handleEpisodeSelect}
+        />
       ) : (
         <div className="h-full">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             onClick={() => setShowList(true)}
             className="flex items-center gap-2 mb-4"
           >
@@ -126,4 +142,4 @@ export default function PodcastPlayer() {
       )}
     </div>
   );
-} 
+}

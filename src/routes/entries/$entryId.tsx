@@ -21,7 +21,8 @@ const EntryView = () => {
       ) : entry ? (
         <div className="space-y-6">
           <h1 className="text-3xl font-bold mb-6">
-            Migraine Episode Report - {new Date(entry.start_time).toDateString()}
+            Migraine Episode Report -{" "}
+            {new Date(entry.start_time).toDateString()}
           </h1>
 
           {/* Basic Information Card */}
@@ -30,9 +31,13 @@ const EntryView = () => {
               <CardTitle>Episode Timeline</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              <div><strong>Start:</strong> {formatDateTime(entry.start_time)}</div>
+              <div>
+                <strong>Start:</strong> {formatDateTime(entry.start_time)}
+              </div>
               {entry.end_time && (
-                <div><strong>End:</strong> {formatDateTime(entry.end_time)}</div>
+                <div>
+                  <strong>End:</strong> {formatDateTime(entry.end_time)}
+                </div>
               )}
             </CardContent>
           </Card>

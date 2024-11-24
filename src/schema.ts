@@ -43,7 +43,9 @@ const managementStepSchema = z.object({
   unit: z.string().min(1, "Unit cannot be empty"),
   notes: z.string().nullable(),
 });
-export const createManagementStepSchema = managementStepSchema.omit({ id: true });
+export const createManagementStepSchema = managementStepSchema.omit({
+  id: true,
+});
 export type ManagementStep = z.infer<typeof managementStepSchema>;
 export type CreateManagementStep = z.infer<typeof createManagementStepSchema>;
 
@@ -72,7 +74,10 @@ const entrySchema = z.object({
 });
 export const createEntrySchema = entrySchema
   .omit({ id: true, updated_at: true, created_at: true })
-  .extend({ weather: createWeatherSchema.nullable(), management_steps: z.array(createManagementStepSchema) });
+  .extend({
+    weather: createWeatherSchema.nullable(),
+    management_steps: z.array(createManagementStepSchema),
+  });
 export type EntryData = z.infer<typeof entrySchema>;
 export type CreateEntry = z.infer<typeof createEntrySchema>;
 
