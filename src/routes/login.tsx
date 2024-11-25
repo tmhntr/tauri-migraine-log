@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useDocument } from "@/hooks/document";
+import { v4 as uuidv4 } from "uuid";
 
 export const Route = createFileRoute("/login")({
   component: Login,
@@ -55,7 +56,7 @@ export function Login() {
       //   },
       // });
       changeDoc((d) => {
-        d.users.push({ id: d.users.length + 1, name: value.name, location: null });
+        d.users.push({ id: uuidv4(), name: value.name, location: null });
       });
       formApi.reset();
     },

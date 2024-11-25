@@ -10,7 +10,6 @@ import {
   CreateEntry,
   createEntrySchema,
   CreateManagementStep,
-  ManagementStep,
   PainSite,
   Symptom,
   Warning,
@@ -23,7 +22,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 export default function EntryForm() {
   // const createEntry = useCreateEntry();
-  const [doc, changeDoc] = useDocument();
+  const [_, changeDoc] = useDocument();
 
   const [activeTab, setActiveTab] = useState("basic-info");
   const navigate = useNavigate({ from: "/create" });

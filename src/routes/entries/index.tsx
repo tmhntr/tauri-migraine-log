@@ -3,7 +3,7 @@ import { DataTable } from "@/components/entry-table";
 
 function DataTablePage() {
   // const { data, error, isLoading } = useListEntries();
-  const [doc, changeDoc] = useDocument();
+  const [doc, _] = useDocument();
   const data = doc?.entries;
   console.log(data);
   // if (error) return <Navigate />;
@@ -28,14 +28,9 @@ function DataTablePage() {
   );
 }
 
-import { createFileRoute, Navigate } from "@tanstack/react-router";
-import { Loader } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
 import { defaultColumns } from "@/components/entry-table/columns";
 import { useDocument } from "@/hooks/document";
-import { SharedState } from "@/schema";
-import { AnyDocumentId } from "@automerge/automerge-repo";
-// import { useListEntries } from "@/hooks/queries";
-// import { EntryType } from "@/schema";
 
 export const Route = createFileRoute("/entries/")({
   component: DataTablePage,

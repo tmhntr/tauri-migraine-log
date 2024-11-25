@@ -27,11 +27,8 @@ import { useStore } from "@tanstack/react-store";
 import { store } from "@/main";
 import { useSyncWeatherData, useWeatherData } from "@/hooks/queries";
 
-// Temporary hardcoded user ID until we implement auth
-const TEMP_USER_ID = 1;
-
 export function WeatherWidget() {
-  const [doc, changeDoc] = useDocument();
+  const [doc] = useDocument();
   const user = useStore(store, (s) => s.user);
 
   const location = doc?.users.find((u) => u.id === user?.id)?.location;

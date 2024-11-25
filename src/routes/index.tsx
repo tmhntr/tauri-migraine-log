@@ -79,6 +79,9 @@ const Home = () => {
       <section className="col-span-3">
         <WeatherWidget />
       </section>
+      <section className="col-span-3">
+        <QRCodeCard />
+      </section>
 
       <section className="col-span-3 sm:col-span-1">
         <Card>
@@ -127,6 +130,7 @@ import ManagementStepLogger from "@/components/ManagementStepLogger";
 import { store } from "@/main";
 import { useStore } from "@tanstack/react-store";
 import { useGetEpisodeCount } from "@/hooks/queries";
+import QRCodeCard from "@/components/QRCode";
 
 export const Route = createFileRoute("/")({
   component: Home,

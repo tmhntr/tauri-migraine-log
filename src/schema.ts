@@ -1,4 +1,4 @@
-import { date, z } from "zod";
+import { z } from "zod";
 
 // Symptom Schema
 const symptomsSchema = z.string().min(1, "Name cannot be empty");
@@ -74,7 +74,7 @@ const locationSchema = z.object({
 
 // User Schema
 const userSchema = z.object({
-  id: z.number().int().positive(),
+  id: z.string().uuid(),
   name: z.string().min(1, "Name cannot be empty"),
   location: locationSchema.nullable(),
 });

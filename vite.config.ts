@@ -4,6 +4,7 @@ import react from "@vitejs/plugin-react";
 import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
 import tsconfigPaths from 'vite-tsconfig-paths';
 import wasm from "vite-plugin-wasm";
+import topLevelAwait from "vite-plugin-top-level-await";
 
 
 // @ts-expect-error process is a nodejs global
@@ -12,7 +13,12 @@ const isTest = process.env.NODE_ENV === 'test'
 
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
-  plugins: [react(), !isTest && TanStackRouterVite(), tsconfigPaths(), wasm()],
+  plugins: [react(), !isTest && TanStackRouterVite(), tsconfigPaths(), wasm(), topLevelAwait({
+    // The export name of top-level await promise for each chunk module
+    promiseExportName: "__tla",
+    // The function to generate import names of top-level await promise in each chunk module
+    promiseImportName: i => `__tla_${i}`
+  })],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

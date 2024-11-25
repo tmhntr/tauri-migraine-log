@@ -16,7 +16,7 @@ export function BasicInfo({ form }: Props) {
   // const symptomQuery = useSymptoms();
   // const warningsQuery = useWarnings();
   // const painSiteQuery = usePainSites();
-  const [doc, changeDoc] = useDocument();
+  const [doc] = useDocument();
   const symptoms = doc?.symptoms;
   const warnings = doc?.warnings;
   const painSites = doc?.painSites;

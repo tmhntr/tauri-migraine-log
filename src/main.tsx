@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { routeTree } from "./routeTree.gen";
 import { Store } from "@tanstack/store";
 import { SharedState, User } from "./schema";
+import { v4 as uuidv4 } from "uuid";
 
 import { AnyDocumentId, isValidAutomergeUrl, Repo } from "@automerge/automerge-repo";
 import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
@@ -34,7 +35,7 @@ if (isValidAutomergeUrl(rootDocUrl)) {
     warnings: ["Aura", "Mood changes", "Neck stiffness"],
     managementSteps: [],
     weather: [],
-    users: [{ id: 1, name: "Your name", location: null }],
+    users: [{ id: uuidv4(), name: "Your name", location: null }],
     locations: [],
   });
 }

@@ -8,7 +8,7 @@ const queryKeys = {
   };
 
 export const useGetEpisodeCount = (start_date: Date, end_date: Date) => {
-    const [doc, changeDoc] = useDocument();
+    const [doc] = useDocument();
 
     const episodes = doc?.entries.filter(
       (entry) =>
@@ -28,7 +28,7 @@ export const useGetEpisodeCount = (start_date: Date, end_date: Date) => {
     startDate: string,
     endDate: string,
   ) => {
-    const [doc, changeDoc] = useDocument();
+    const [doc] = useDocument();
 
     return useQuery({
       queryKey: queryKeys.weather(locationId, startDate, endDate),

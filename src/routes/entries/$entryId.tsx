@@ -1,8 +1,6 @@
 import { colorCodes } from "@/components/entry-table/columns";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { SharedState } from "@/schema";
-import { AnyDocumentId } from "@automerge/automerge-repo";
 import { useDocument } from "@/hooks/document";
 // import { useGetEntry } from "@/hooks/queries";
 import { createFileRoute } from "@tanstack/react-router";
@@ -10,7 +8,7 @@ import { createFileRoute } from "@tanstack/react-router";
 const EntryView = () => {
   const { entryId } = Route.useParams();
   // const { data: entry, error, isLoading } = useGetEntry(Number(entryId));
-  const [doc, changeDoc] = useDocument();
+  const [doc, _] = useDocument();
 
   const formatDateTime = (dateString: string) => {
     return new Date(dateString).toLocaleString();

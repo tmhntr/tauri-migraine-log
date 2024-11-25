@@ -20,7 +20,7 @@ import { useDocument } from "@/hooks/document";
 
 const ManagementStepLogger = () => {
   // const createManagementStep = useCreateManagementStep();
-  const [doc, changeDoc] = useDocument();
+  const [_, changeDoc] = useDocument();
 
 
   const form = useForm({

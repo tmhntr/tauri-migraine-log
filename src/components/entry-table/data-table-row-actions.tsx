@@ -14,7 +14,7 @@ import { useDocument } from "@/hooks/document";
 
 export function DataTableRowActions({ entry }: { entry: EntryData }) {
   // const mutation = useDeleteEntry();
-  const [doc, changeDoc] = useDocument();
+  const [_, changeDoc] = useDocument();
 
 
   return (

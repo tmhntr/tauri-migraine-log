@@ -4,24 +4,17 @@ import { Label } from "./ui/label";
 import { Button } from "./ui/button";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 // import { useUpdateUserLocation, useUpdateUser } from "@/hooks/queries";
-import { createUserSchema, createLocationSchema, User } from "@/schema";
+import { createUserSchema, createLocationSchema } from "@/schema";
 import { store } from "@/main";
 import { useStore } from "@tanstack/react-store";
-import { useNavigate } from "@tanstack/react-router";
+// import { useNavigate } from "@tanstack/react-router";
 import { useDocument } from "@/hooks/document";
 
-const useUserOrNavigate = () => {
-  const user = useStore(store, (s) => s.user);
-  const navigate = useNavigate();
-  if (!user) {
-    navigate({ to: "/login" });
-  }
-  return user as User;
-};
+
 
 const UserForm = () => {
   // const updateUser = useUpdateUser();
-  const [doc, changeDoc] = useDocument();
+  const [_, changeDoc] = useDocument();
 
   const user = useStore(store, (s) => s.user);
 
@@ -73,7 +66,7 @@ const UserForm = () => {
 
 const UserLocationForm = () => {
   // const updateUserLocation = useUpdateUserLocation();
-  const [doc, changeDoc] = useDocument();
+  const [_, changeDoc] = useDocument();
 
   const form = useForm({
     defaultValues: {
