@@ -4,25 +4,28 @@ import { CreateEntry } from "@/schema";
 import { ReactFormApi, Validator } from "@tanstack/react-form";
 import { DateTimePicker } from "../ui/datetime-picker";
 import { Slider } from "../ui/slider";
-import { usePainSites, useSymptoms, useWarnings } from "@/hooks/queries";
+// import { usePainSites, useSymptoms, useWarnings } from "@/hooks/queries";
 import MultipleSelector, { Option } from "../ui/multiple-selector";
+import { useDocument } from "@/hooks/document";
 
 interface Props {
   form: ReactFormApi<CreateEntry, Validator<CreateEntry>>;
 }
 
 export function BasicInfo({ form }: Props) {
-  const symptomQuery = useSymptoms();
-  const warningsQuery = useWarnings();
-  const painSiteQuery = usePainSites();
+  // const symptomQuery = useSymptoms();
+  // const warningsQuery = useWarnings();
+  // const painSiteQuery = usePainSites();
+  const [doc, changeDoc] = useDocument();
+  const symptoms = doc?.symptoms;
+  const warnings = doc?.warnings;
+  const painSites = doc?.painSites;
+
 
   const toOptionList = (
-    l: {
-      id: number;
-      name: string;
-    }[],
+    l: string[],
   ) => {
-    return l.map((p) => ({ label: p.name, value: p.name }) as Option);
+    return l.map((p) => ({ label: p, value: p }) as Option);
   };
 
   const painLevels = ["Mild", "Moderate", "Severe", "Extreme"] as const;
@@ -46,14 +49,11 @@ export function BasicInfo({ form }: Props) {
   };
   const fromOptionList = (
     options: Option[],
-    queryResult: {
-      id: number;
-      name: string;
-    }[],
+    queryResult: string[],
   ) => {
     if (!queryResult) return [];
     return queryResult.filter((item) =>
-      options.some((option) => option.value === item.name),
+      options.some((option) => option.value === item),
     );
   };
   return (
@@ -105,6 +105,7 @@ export function BasicInfo({ form }: Props) {
                 }
               />
               <Button
+                type="button"
                 onClick={() => field.handleChange(new Date().toISOString())}
               >
                 Now
@@ -148,10 +149,10 @@ export function BasicInfo({ form }: Props) {
                 value={toOptionList(field.state.value)}
                 onChange={(o) =>
                   field.handleChange(
-                    fromOptionList(o, painSiteQuery.data || []),
+                    fromOptionList(o, painSites || []),
                   )
                 }
-                options={toOptionList(painSiteQuery.data || [])}
+                options={toOptionList(painSites || [])}
               />
             </div>
           )}
@@ -167,9 +168,9 @@ export function BasicInfo({ form }: Props) {
               <MultipleSelector
                 value={toOptionList(field.state.value)}
                 onChange={(o) =>
-                  field.handleChange(fromOptionList(o, symptomQuery.data || []))
+                  field.handleChange(fromOptionList(o, symptoms || []))
                 }
-                options={toOptionList(symptomQuery.data || [])}
+                options={toOptionList(symptoms || [])}
               />
             </div>
           )}
@@ -186,10 +187,10 @@ export function BasicInfo({ form }: Props) {
                 value={toOptionList(field.state.value)}
                 onChange={(o) =>
                   field.handleChange(
-                    fromOptionList(o, warningsQuery.data || []),
+                    fromOptionList(o, warnings || []),
                   )
                 }
-                options={toOptionList(warningsQuery.data || [])}
+                options={toOptionList(warnings || [])}
               />
             </div>
           )}

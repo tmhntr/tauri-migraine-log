@@ -8,6 +8,8 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { WeatherWidget } from "@/components/WeatherWidget";
+// import { useDocument } from "@/hooks/document";
+
 // import { useGeolocation } from "@/hooks/useGeolocation";
 
 const Home = () => {
@@ -118,12 +120,13 @@ const Home = () => {
 };
 
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useGetEpisodeCount } from "@/hooks/queries";
+// import { useGetEpisodeCount } from "@/hooks/queries";
 import React from "react";
 import PodcastPlayer from "@/components/PodcastPlayer";
 import ManagementStepLogger from "@/components/ManagementStepLogger";
 import { store } from "@/main";
 import { useStore } from "@tanstack/react-store";
+import { useGetEpisodeCount } from "@/hooks/queries";
 
 export const Route = createFileRoute("/")({
   component: Home,

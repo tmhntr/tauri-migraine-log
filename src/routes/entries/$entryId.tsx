@@ -1,24 +1,31 @@
 import { colorCodes } from "@/components/entry-table/columns";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { useGetEntry } from "@/hooks/queries";
+import { SharedState } from "@/schema";
+import { AnyDocumentId } from "@automerge/automerge-repo";
+import { useDocument } from "@/hooks/document";
+// import { useGetEntry } from "@/hooks/queries";
 import { createFileRoute } from "@tanstack/react-router";
 
 const EntryView = () => {
   const { entryId } = Route.useParams();
-  const { data: entry, error, isLoading } = useGetEntry(Number(entryId));
+  // const { data: entry, error, isLoading } = useGetEntry(Number(entryId));
+  const [doc, changeDoc] = useDocument();
 
   const formatDateTime = (dateString: string) => {
     return new Date(dateString).toLocaleString();
   };
 
+  const entry = doc?.entries.find(e => e.id === entryId);
+
   return (
     <div className="container mx-auto p-4">
-      {isLoading ? (
+      {/* {isLoading ? (
         <div className="text-center">Loading...</div>
       ) : error ? (
         <div className="text-center text-red-500">Error: {error.message}</div>
-      ) : entry ? (
+      ) : entry ? ( */}
+      {entry ? (
         <div className="space-y-6">
           <h1 className="text-3xl font-bold mb-6">
             Migraine Episode Report -{" "}
@@ -52,8 +59,8 @@ const EntryView = () => {
               <div>
                 <h3 className="font-semibold mb-2">Warnings</h3>
                 <ul className="list-disc list-inside">
-                  {entry.warnings.map((warning) => (
-                    <li key={warning.id}>{warning.name}</li>
+                  {entry.warnings.map((warning, index) => (
+                    <li key={index}>{warning}</li>
                   ))}
                   {entry.warning_other && (
                     <li className="text-gray-600">{entry.warning_other}</li>
@@ -73,8 +80,8 @@ const EntryView = () => {
               <div>
                 <h3 className="font-semibold mb-2">Pain Locations</h3>
                 <ul className="list-disc list-inside">
-                  {entry.pain_sites.map((site) => (
-                    <li key={site.id}>{site.name}</li>
+                  {entry.pain_sites.map((site, i) => (
+                    <li key={i}>{site}</li>
                   ))}
                 </ul>
               </div>
@@ -83,8 +90,8 @@ const EntryView = () => {
               <div>
                 <h3 className="font-semibold mb-2">Associated Symptoms</h3>
                 <ul className="list-disc list-inside">
-                  {entry.symptoms.map((symptom) => (
-                    <li key={symptom.id}>{symptom.name}</li>
+                  {entry.symptoms.map((symptom, i) => (
+                    <li key={i}>{symptom}</li>
                   ))}
                 </ul>
               </div>

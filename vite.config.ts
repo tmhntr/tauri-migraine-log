@@ -3,6 +3,7 @@ import path from "path"
 import react from "@vitejs/plugin-react";
 import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
 import tsconfigPaths from 'vite-tsconfig-paths';
+import wasm from "vite-plugin-wasm";
 
 
 // @ts-expect-error process is a nodejs global
@@ -11,7 +12,7 @@ const isTest = process.env.NODE_ENV === 'test'
 
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
-  plugins: [react(), !isTest && TanStackRouterVite(), tsconfigPaths()],
+  plugins: [react(), !isTest && TanStackRouterVite(), tsconfigPaths(), wasm()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -42,7 +43,7 @@ export default defineConfig(async () => ({
   server: {
     port: 1420,
     strictPort: true,
-    host: host || false,
+    host: host || true,
     hmr: host
       ? {
           protocol: "ws",
@@ -53,6 +54,10 @@ export default defineConfig(async () => ({
     watch: {
       // 3. tell vite to ignore watching `src-tauri`
       ignored: ["**/src-tauri/**"],
+    },
+    worker: {
+      format: "es",
+      plugins: () => [wasm()],
     },
   },
   envPrefix: ['VITE_', 'TAURI_ENV_*'],
@@ -66,5 +71,6 @@ export default defineConfig(async () => ({
     // don't minify for debug builds
     // produce sourcemaps for debug builds
     sourcemap: !!process.env.TAURI_ENV_DEBUG,
-  }
+  },
+  
 }));

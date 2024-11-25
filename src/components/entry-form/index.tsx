@@ -2,13 +2,14 @@ import { useState } from "react";
 import { BasicInfo } from "./BasicInfo";
 import { OtherDetails } from "./OtherDetails";
 import { Button } from "../ui/button";
-import { useCreateEntry } from "../../hooks/queries";
+// import { useCreateEntry } from "../../hooks/queries";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Card, CardContent, CardFooter } from "../ui/card";
 import { useForm } from "@tanstack/react-form";
 import {
   CreateEntry,
   createEntrySchema,
+  CreateManagementStep,
   ManagementStep,
   PainSite,
   Symptom,
@@ -17,14 +18,19 @@ import {
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { Weather } from "./Weather";
 import { useNavigate } from "@tanstack/react-router";
+import { useDocument } from "@/hooks/document";
+import { v4 as uuidv4 } from 'uuid';
 
 export default function EntryForm() {
-  const createEntry = useCreateEntry();
+  // const createEntry = useCreateEntry();
+  const [doc, changeDoc] = useDocument();
+
   const [activeTab, setActiveTab] = useState("basic-info");
   const navigate = useNavigate({ from: "/create" });
 
   const form = useForm({
     defaultValues: {
+      id: uuidv4(),
       start_time: new Date().toDateString(),
       end_time: null,
       headache_severity: null,
@@ -36,7 +42,7 @@ export default function EntryForm() {
       recent_duration_of_sleep: null,
       warning_other: "",
       weather: null,
-      management_steps: [] as ManagementStep[],
+      management_steps: [] as CreateManagementStep[],
     } as CreateEntry,
     validators: {
       onChange: createEntrySchema,
@@ -45,10 +51,13 @@ export default function EntryForm() {
     onSubmit: async ({ value }) => {
       // Do something with form data
       console.log(value);
-      const entryId = await createEntry.mutateAsync(value);
+      const entry = createEntrySchema.parse(value);
+      changeDoc((d) => {
+        d.entries.push(entry);
+      });
       navigate({
         to: `/entries/$entryId`,
-        params: { entryId: entryId.toString() },
+        params: { entryId: entry.id.toString() },
       });
     },
   });
