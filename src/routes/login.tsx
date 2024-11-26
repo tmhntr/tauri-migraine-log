@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useListUsers, useCreateUser } from "@/hooks/queries";
+// import { useListUsers, useCreateUser } from "@/hooks/queries";
 import { store } from "@/main";
 import { createUserSchema, User } from "@/schema";
 import { useForm } from "@tanstack/react-form";
@@ -14,14 +14,19 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useDocument } from "@/hooks/document";
+import { v4 as uuidv4 } from "uuid";
 
 export const Route = createFileRoute("/login")({
   component: Login,
 });
 
+  
+
 export function Login() {
-  const { data: users, isLoading, isError } = useListUsers();
-  const createUserMutation = useCreateUser();
+  const [doc, changeDoc] = useDocument();
+  const users = doc?.users
+  // const createUserMutation = useCreateUser();
   const navigate = useNavigate();
   const [isCreatingUser, setIsCreatingUser] = React.useState(false);
 
@@ -44,23 +49,18 @@ export function Login() {
     },
     validatorAdapter: zodValidator(),
     onSubmit: async ({ value, formApi }) => {
-      createUserMutation.mutate(value.name, {
-        onSuccess: (userId) => {
-          const newUser = { id: userId, name: value.name };
-          handleUserSelect(newUser);
-        },
+      // createUserMutation.mutate(value.name, {
+      //   onSuccess: (userId) => {
+      //     const newUser = { id: userId, name: value.name };
+      //     handleUserSelect(newUser);
+      //   },
+      // });
+      changeDoc((d) => {
+        d.users.push({ id: uuidv4(), name: value.name, location: null });
       });
       formApi.reset();
     },
   });
-
-  if (isError) {
-    return <div>Error loading users</div>;
-  }
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">

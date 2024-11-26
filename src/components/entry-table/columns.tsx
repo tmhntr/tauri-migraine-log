@@ -30,6 +30,7 @@ const columnHelper = createColumnHelper<EntryData>();
 
 export const defaultColumns: ColumnDef<EntryData, any>[] = [
   columnHelper.accessor("start_time", {
+    id: "start_date",
     header: "Start Date",
     cell: (props) => new Date(props.getValue()).toDateString() ?? "N/A",
   }),
@@ -81,8 +82,8 @@ export const defaultColumns: ColumnDef<EntryData, any>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex flex-wrap gap-1 text-muted-foreground">
-          {row.original.symptoms.map((symptom) => (
-            <Badge key={symptom.id}>{symptom.name}</Badge>
+          {row.original.symptoms.map((symptom, i) => (
+            <Badge key={i}>{symptom}</Badge>
           ))}
         </div>
       );
@@ -93,8 +94,8 @@ export const defaultColumns: ColumnDef<EntryData, any>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex flex-wrap gap-1 text-muted-foreground">
-          {row.original.pain_sites.map((pain_site) => (
-            <Badge key={pain_site.id}>{pain_site.name}</Badge>
+          {row.original.pain_sites.map((pain_site, i) => (
+            <Badge key={i}>{pain_site}</Badge>
           ))}
         </div>
       );
@@ -105,8 +106,8 @@ export const defaultColumns: ColumnDef<EntryData, any>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex flex-wrap gap-1 text-muted-foreground">
-          {row.original.warnings.map((warning) => (
-            <Badge key={warning.id}>{warning.name}</Badge>
+          {row.original.warnings.map((warning, i) => (
+            <Badge key={i}>{warning}</Badge>
           ))}
         </div>
       );

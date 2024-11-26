@@ -9,10 +9,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { EntryData } from "@/schema";
-import { useDeleteEntry } from "@/hooks/queries";
+import { useDocument } from "@/hooks/document";
+// import { useDeleteEntry } from "@/hooks/queries";
 
 export function DataTableRowActions({ entry }: { entry: EntryData }) {
-  const mutation = useDeleteEntry();
+  // const mutation = useDeleteEntry();
+  const [_, changeDoc] = useDocument();
+
 
   return (
     <DropdownMenu>
@@ -32,7 +35,9 @@ export function DataTableRowActions({ entry }: { entry: EntryData }) {
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            mutation.mutate(entry.id);
+            changeDoc((d) => {
+              d.entries = d.entries.filter((e) => e.id !== entry.id);
+            });
           }}
         >
           Delete

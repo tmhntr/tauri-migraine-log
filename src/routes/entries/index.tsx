@@ -2,9 +2,11 @@
 import { DataTable } from "@/components/entry-table";
 
 function DataTablePage() {
-  const { data, error, isLoading } = useListEntries();
-
-  if (error) return <Navigate />;
+  // const { data, error, isLoading } = useListEntries();
+  const [doc, _] = useDocument();
+  const data = doc?.entries;
+  console.log(data);
+  // if (error) return <Navigate />;
 
   return (
     <>
@@ -19,22 +21,16 @@ function DataTablePage() {
           </div>
         </div>{" "}
         <div className="flex flex-col">
-          {isLoading ? (
-            <Loader />
-          ) : (
-            data && <DataTable data={data} columns={defaultColumns} />
-          )}
+          {data && <DataTable data={data} columns={defaultColumns} />}
         </div>
       </div>
     </>
   );
 }
 
-import { createFileRoute, Navigate } from "@tanstack/react-router";
-import { Loader } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
 import { defaultColumns } from "@/components/entry-table/columns";
-import { useListEntries } from "@/hooks/queries";
-// import { EntryType } from "@/schema";
+import { useDocument } from "@/hooks/document";
 
 export const Route = createFileRoute("/entries/")({
   component: DataTablePage,

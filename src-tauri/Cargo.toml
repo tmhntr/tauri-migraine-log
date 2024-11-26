@@ -21,6 +21,7 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 dirs = "5.0"
 sqlx = "*"
+local-ip-address = "0.6.3"
 
 [dependencies.tauri-plugin-sql]
 features = ["sqlite"] # or "postgres", or "mysql"

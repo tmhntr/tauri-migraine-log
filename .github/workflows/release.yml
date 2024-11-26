@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - dev
 
 jobs:
   build-and-test:
@@ -154,5 +153,5 @@ jobs:
           releaseName: 'Migrainelog v${{ needs.semantic-release.outputs.release_version }}'
           releaseBody: 'See the assets to download this version and install.'
           releaseDraft: false
-          prerelease: ${{ github.ref != 'refs/heads/main' }}
+          prerelease: true
           args: ${{ matrix.args }}

@@ -7,7 +7,7 @@ import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { DateTimePicker } from "./ui/datetime-picker";
-import { useCreateManagementStep } from "@/hooks/queries";
+// import { useCreateManagementStep } from "@/hooks/queries";
 import {
   Card,
   CardContent,
@@ -15,10 +15,13 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
+import { useDocument } from "@/hooks/document";
 // import { Button, Input, Textarea } from "shadcn";
 
 const ManagementStepLogger = () => {
-  const createManagementStep = useCreateManagementStep();
+  // const createManagementStep = useCreateManagementStep();
+  const [_, changeDoc] = useDocument();
+
 
   const form = useForm({
     defaultValues: {
@@ -35,7 +38,15 @@ const ManagementStepLogger = () => {
     onSubmit: async ({ value, formApi }) => {
       // Do something with form data
       console.log(value);
-      await createManagementStep.mutateAsync(value);
+      // await createManagementStep.mutateAsync(value);
+      const id = crypto.randomUUID().toString();
+      const managementStep = createManagementStepSchema.parse({
+        ...value,
+        id,
+      });
+      changeDoc((d) => {
+        d.managementSteps.push(managementStep);
+      })
       formApi.reset();
     },
   });

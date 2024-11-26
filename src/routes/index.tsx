@@ -8,6 +8,8 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { WeatherWidget } from "@/components/WeatherWidget";
+// import { useDocument } from "@/hooks/document";
+
 // import { useGeolocation } from "@/hooks/useGeolocation";
 
 const Home = () => {
@@ -77,6 +79,9 @@ const Home = () => {
       <section className="col-span-3">
         <WeatherWidget />
       </section>
+      <section className="col-span-3">
+        <QRCodeCard />
+      </section>
 
       <section className="col-span-3 sm:col-span-1">
         <Card>
@@ -118,12 +123,14 @@ const Home = () => {
 };
 
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useGetEpisodeCount } from "@/hooks/queries";
+// import { useGetEpisodeCount } from "@/hooks/queries";
 import React from "react";
 import PodcastPlayer from "@/components/PodcastPlayer";
 import ManagementStepLogger from "@/components/ManagementStepLogger";
 import { store } from "@/main";
 import { useStore } from "@tanstack/react-store";
+import { useGetEpisodeCount } from "@/hooks/queries";
+import QRCodeCard from "@/components/QRCode";
 
 export const Route = createFileRoute("/")({
   component: Home,
