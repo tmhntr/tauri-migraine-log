@@ -11,11 +11,11 @@ import QRCode from "react-qr-code";
 //     if (!RTCPeerConnection) {
 //       reject('Your browser does not support this API');
 //     }
-    
+
 //     var rtc = new RTCPeerConnection({iceServers:[]});
 //     var addrs = {} as any;
 //     addrs["0.0.0.0"] = false;
-    
+
 //     function grepSDP(sdp) {
 //         var hosts = [];
 //         var finalIP = '';
@@ -35,11 +35,11 @@ import QRCode from "react-qr-code";
 //         });
 //         return finalIP;
 //     }
-    
+
 //     if (1 || window.mozRTCPeerConnection) {
 //         rtc.createDataChannel('', {reliable:false});
 //     };
-    
+
 //     rtc.onicecandidate = function (evt) {
 //         if (evt.candidate) {
 //           var addr = grepSDP("a="+evt.candidate.candidate);
@@ -55,16 +55,18 @@ import QRCode from "react-qr-code";
 export default function QRCodeCard() {
   const [localIp, setLocalIp] = useState<string | null>(null);
   useEffect(() => {
-      invoke<string>("get_local_ip", {}).then((ips) => {
-          console.log(ips);
-          setLocalIp(ips);
-      });
+    invoke<string>("get_local_ip", {}).then((ips) => {
+      console.log(ips);
+      setLocalIp(ips);
+    });
   }, []);
-  const docUrl = localStorage.getItem("docUrl")
+  const docUrl = localStorage.getItem("docUrl");
   return (
     <Card className="col-span-3 sm:col-span-1">
       <CardContent className="space-y-4">
-      <QRCode value={`http://${localIp}:1420#${docUrl}`} />
+        <QRCode
+          value={`${process.env.NODE_ENV === "development" ? "http://" + localIp + ":1420" : "https://tmhntr.github.io/tauri-migraine-log/"}#${docUrl}`}
+        />
       </CardContent>
     </Card>
   );
