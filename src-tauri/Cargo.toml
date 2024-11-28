@@ -15,16 +15,8 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2.0.0-rc", features = [] }
 
 [dependencies]
-libsqlite3-sys = { version = "*", features = ["bundled-sqlcipher"] }
 tauri = { version = "2.1.1-rc", features = [] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 dirs = "5.0"
-sqlx = "*"
 local-ip-address = "0.6.3"
-
-[dependencies.tauri-plugin-sql]
-features = ["sqlite"] # or "postgres", or "mysql"
-version = "2.0.0-beta"
-git = "https://github.com/eleroy/plugins-workspace"
-branch = "sql/sqlcipher"
