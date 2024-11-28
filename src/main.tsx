@@ -26,7 +26,10 @@ console.log({
 });
 let handle;
 if (isValidAutomergeUrl(rootDocUrl)) {
+  // add docUrl to localStorage
+  
   handle = repo.find(rootDocUrl);
+  localStorage.setItem("docUrl", handle.url);
 } else {
   handle = repo.create<SharedState>({
     entries: [],
@@ -38,9 +41,9 @@ if (isValidAutomergeUrl(rootDocUrl)) {
     users: [{ id: uuidv4(), name: "Your name", location: null }],
     locations: [],
   });
+  localStorage.setItem("docUrl", handle.url);
 }
 const docUrl = (document.location.hash = handle.url);
-localStorage.setItem("docUrl", docUrl);
 repo.addListener("document", (arg: any) => console.log(arg));
 console.log(repo.handles);
 
