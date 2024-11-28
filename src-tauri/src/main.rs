@@ -1,9 +1,9 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-mod db;
-use sqlx::sqlite::SqliteConnectOptions;
-use std::str::FromStr;
+// mod db;
+// use sqlx::sqlite::SqliteConnectOptions;
+// use std::str::FromStr;
 
 #[tauri::command]
 fn get_env(key: &str) -> String {
@@ -16,7 +16,7 @@ fn get_local_ip() -> String {
 }
 
 use local_ip_address::local_ip;
-use std::net::IpAddr;
+// use std::net::IpAddr;
 
 
 fn main() {
