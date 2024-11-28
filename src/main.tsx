@@ -45,7 +45,7 @@ repo.addListener("document", (arg: any) => console.log(arg));
 console.log(repo.handles);
 
 // Create a new router instance
-const router = createRouter({ routeTree, basepath: "/" });
+const router = createRouter({ routeTree, basepath: process.env.NODE_ENV === "pages" ? "/tauri-migraine-log/" : "/" });
 
 const queryClient = new QueryClient();
 
