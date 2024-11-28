@@ -26,7 +26,7 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Build
-        run: NODE_ENV=pages vite build
+        run: NODE_ENV=pages yarn build
 
 
       - name: Upload production-ready build files
