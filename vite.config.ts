@@ -19,6 +19,7 @@ export default defineConfig(async () => ({
     // The function to generate import names of top-level await promise in each chunk module
     promiseImportName: i => `__tla_${i}`
   })],
+  base: process.env.NODE_ENV === "pages" ? "/tauri-migraine-log/" : "/",
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -70,7 +71,6 @@ export default defineConfig(async () => ({
   build: {
     // Tauri uses Chromium on Windows and WebKit on macOS and Linux
     target:
-// @ts-expect-error process is a nodejs global
       process.env.TAURI_ENV_PLATFORM == 'windows'
         ? 'chrome105'
         : 'safari13',
