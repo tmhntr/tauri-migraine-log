@@ -3,24 +3,20 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Button } from "./ui/button";
 import { zodValidator } from "@tanstack/zod-form-adapter";
-import { useUpdateUserLocation, useUpdateUser } from "@/hooks/queries";
-import { createUserSchema, createLocationSchema, User } from "@/schema";
+// import { useUpdateUserLocation, useUpdateUser } from "@/hooks/queries";
+import { createUserSchema, createLocationSchema } from "@/schema";
 import { store } from "@/main";
 import { useStore } from "@tanstack/react-store";
-import { useNavigate } from "@tanstack/react-router";
+// import { useNavigate } from "@tanstack/react-router";
+import { useDocument } from "@/hooks/document";
 
-const useUserOrNavigate = () => {
-  const user = useStore(store, (s) => s.user);
-  const navigate = useNavigate();
-  if (!user) {
-    navigate({ to: "/login" });
-  }
-  return user as User;
-};
+
 
 const UserForm = () => {
-  const updateUser = useUpdateUser();
-  const user = useUserOrNavigate();
+  // const updateUser = useUpdateUser();
+  const [_, changeDoc] = useDocument();
+
+  const user = useStore(store, (s) => s.user);
 
   const form = useForm({
     defaultValues: {
@@ -31,10 +27,11 @@ const UserForm = () => {
     },
     validatorAdapter: zodValidator(),
     onSubmit: async ({ value, formApi }) => {
-      updateUser.mutate({
-        userId: user?.id, // Assuming a single user for simplicity
-        name: value.name,
+      user && changeDoc((d) => {
+        if (d.users.length > 0) 
+          d.users[0].name = value.name as string;
       });
+      
       formApi.reset();
     },
   });
@@ -68,7 +65,8 @@ const UserForm = () => {
 };
 
 const UserLocationForm = () => {
-  const updateUserLocation = useUpdateUserLocation();
+  // const updateUserLocation = useUpdateUserLocation();
+  const [_, changeDoc] = useDocument();
 
   const form = useForm({
     defaultValues: {
@@ -82,11 +80,20 @@ const UserLocationForm = () => {
     },
     validatorAdapter: zodValidator(),
     onSubmit: async ({ value, formApi }) => {
-      updateUserLocation.mutate({
-        userId: 1, // Assuming a single user for simplicity
-        latitude: parseFloat(value.latitude),
-        longitude: parseFloat(value.longitude),
-        timezone: value.timezone,
+      // updateUserLocation.mutate({
+      //   userId: 1, // Assuming a single user for simplicity
+      //   latitude: parseFloat(value.latitude),
+      //   longitude: parseFloat(value.longitude),
+      //   timezone: value.timezone,
+      // });
+      changeDoc((d) => {
+        d.users[0].location = {
+          id: crypto.randomUUID(),
+          latitude: parseFloat(value.latitude),
+          longitude: parseFloat(value.longitude),
+          timezone: value.timezone,
+          name: value.city,
+        };
       });
       formApi.reset();
     },

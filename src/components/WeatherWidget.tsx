@@ -6,11 +6,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  useUserLocation,
-  useWeatherData,
-  useSyncWeatherData,
-} from "@/hooks/queries";
+// import {
+//   useUserLocation,
+//   useWeatherData,
+//   useSyncWeatherData,
+// } from "@/hooks/queries";
 import { format, subDays } from "date-fns";
 import {
   LineChart,
@@ -22,17 +22,21 @@ import {
 } from "recharts";
 import { Cloud, Droplets, Wind, ArrowDown, ArrowUp, Gauge } from "lucide-react";
 import { useEffect } from "react";
-
-// Temporary hardcoded user ID until we implement auth
-const TEMP_USER_ID = 1;
+import { useDocument } from "@/hooks/document";
+import { useStore } from "@tanstack/react-store";
+import { store } from "@/main";
+import { useSyncWeatherData, useWeatherData } from "@/hooks/queries";
 
 export function WeatherWidget() {
-  const location = useUserLocation(TEMP_USER_ID);
+  const [doc] = useDocument();
+  const user = useStore(store, (s) => s.user);
+
+  const location = doc?.users.find((u) => u.id === user?.id)?.location;
   const today = new Date();
   const thirtyDaysAgo = subDays(today, 30);
 
-  const weatherData = useWeatherData(
-    location.data?.id ?? 0,
+  const weatherData = location && useWeatherData(
+    location.id,
     format(thirtyDaysAgo, "yyyy-MM-dd"),
     format(today, "yyyy-MM-dd"),
   );
@@ -41,18 +45,18 @@ export function WeatherWidget() {
 
   // Sync weather data when location is available
   useEffect(() => {
-    if (location.data) {
+    if (location) {
       syncWeather.mutate({
-        locationId: location.data.id,
-        latitude: location.data.latitude,
-        longitude: location.data.longitude,
+        locationId: location.id,
+        latitude: location.latitude,
+        longitude: location.longitude,
         startDate: format(thirtyDaysAgo, "yyyy-MM-dd"),
         endDate: format(today, "yyyy-MM-dd"),
       });
     }
-  }, [location.data]);
+  }, [location]);
 
-  const currentWeather = weatherData.data?.[weatherData.data.length - 1];
+  const currentWeather = weatherData?.data?.[weatherData.data.length - 1];
 
   return (
     <Card className="col-span-3 sm:col-span-1 h-full">
@@ -109,7 +113,7 @@ export function WeatherWidget() {
           </TabsContent>
 
           <TabsContent value="history">
-            {weatherData.data && (
+            {weatherData?.data && (
               <ResponsiveContainer width="100%" height={200}>
                 <LineChart data={weatherData.data}>
                   <XAxis

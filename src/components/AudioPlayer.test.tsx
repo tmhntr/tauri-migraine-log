@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import AudioPlayer, { PodcastEpisode } from "./AudioPlayer";
 import "@testing-library/jest-dom";
+import { expect, test } from "vitest";
 
 test("renders AudioPlayer component", () => {
   const episode: PodcastEpisode = {
