@@ -19,6 +19,7 @@ import { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 // import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "./ui/breadcrumb";
 import { SmartBreadcrumb } from "./SmartBreadcrumb";
+import { ModeToggle } from "./mode-toggle";
 // export const description =
 //   "An orders dashboard with a sidebar navigation. The sidebar has icon navigation. The content area has a breadcrumb and search in the header. The main area has a list of recent orders with a filter and export button. The main area also has a detailed view of a single order with order details, shipping information, billing information, customer information, and payment information.";
 
@@ -63,10 +64,10 @@ const Layout = ({ children }: Props) => {
                   className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                 >
                   <LineChart className="h-5 w-5" />
-                  <span className="sr-only">Analytics</span>
+                  <span className="sr-only">Records</span>
                 </Link>
               </TooltipTrigger>
-              <TooltipContent side="right">Analytics</TooltipContent>
+              <TooltipContent side="right">Records</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </nav>
@@ -91,7 +92,7 @@ const Layout = ({ children }: Props) => {
         <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
           <Sheet>
             <SheetTrigger asChild>
-              <Button size="icon" variant="outline" className="sm:hidden">
+              <Button size="icon" variant="outline" className="sm:hidden justify-self-start">
                 <PanelLeft className="h-5 w-5" />
                 <span className="sr-only">Toggle Menu</span>
               </Button>
@@ -117,7 +118,7 @@ const Layout = ({ children }: Props) => {
                   className="flex items-center gap-4 px-2.5 text-foreground"
                 >
                   <LineChart className="h-5 w-5" />
-                  Entries
+                  Records
                 </Link>
                 <Link
                   to="/settings"
@@ -157,7 +158,7 @@ const Layout = ({ children }: Props) => {
               className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]"
             />
           </div> */}
-          <DropdownMenu>
+          {/* <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
@@ -181,7 +182,8 @@ const Layout = ({ children }: Props) => {
               <DropdownMenuSeparator />
               <DropdownMenuItem>Logout</DropdownMenuItem>
             </DropdownMenuContent>
-          </DropdownMenu>
+          </DropdownMenu> */}
+          <ModeToggle className="ml-auto" />
         </header>
         <main className="flex-1">{children}</main>
       </div>

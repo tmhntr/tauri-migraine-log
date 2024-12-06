@@ -110,3 +110,6 @@ export interface SharedState {
   locations: Location[];
 }
 
+export const authenticationSearchParams = z.object({
+  redirect: z.string().optional(),
+});

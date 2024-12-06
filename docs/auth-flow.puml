@@ -1,0 +1,17 @@
+@startuml
+actor User
+participant "Client" as Client
+participant "Authorization Server" as AuthServer
+participant "Resource Server" as ResourceServer
+
+User -> Client: Open Application
+Client -> AuthServer: Authorization Request (code_challenge)
+AuthServer -> User: Authorization Prompt
+User -> AuthServer: Authorize Application
+AuthServer -> Client: Authorization Code
+Client -> AuthServer: Token Request (code_verifier)
+AuthServer -> Client: Access Token
+Client -> ResourceServer: API Request (Access Token)
+ResourceServer -> Client: API Response
+
+@enduml

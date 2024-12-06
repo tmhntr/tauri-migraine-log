@@ -25,7 +25,7 @@
     "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true
   },
-  "include": ["src"],
+  "include": ["src", "server"],
   "references": [{ "path": "./tsconfig.node.json" }],
   "types": ["node", "jest", "@testing-library/jest-dom"]
 }

@@ -8,189 +8,238 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
+import { createFileRoute } from '@tanstack/react-router'
+
 // Import Routes
 
-import { Route as rootRoute } from "./routes/__root";
-import { Route as SettingsImport } from "./routes/settings";
-import { Route as LoginImport } from "./routes/login";
-import { Route as EditImport } from "./routes/edit";
-import { Route as CreateImport } from "./routes/create";
-import { Route as IndexImport } from "./routes/index";
-import { Route as EntriesIndexImport } from "./routes/entries/index";
-import { Route as EntriesEntryIdImport } from "./routes/entries/$entryId";
+import { Route as rootRoute } from './routes/__root'
+import { Route as SettingsImport } from './routes/settings'
+import { Route as RegisterImport } from './routes/register'
+import { Route as LoginImport } from './routes/login'
+import { Route as EditImport } from './routes/edit'
+import { Route as CreateImport } from './routes/create'
+import { Route as IndexImport } from './routes/index'
+import { Route as EntriesIndexImport } from './routes/entries/index'
+import { Route as EntriesEntryIdImport } from './routes/entries/$entryId'
+
+// Create Virtual Routes
+
+const InvitationTokenLazyImport = createFileRoute('/invitation/$token')()
 
 // Create/Update Routes
 
 const SettingsRoute = SettingsImport.update({
-  id: "/settings",
-  path: "/settings",
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
+
+const RegisterRoute = RegisterImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const LoginRoute = LoginImport.update({
-  id: "/login",
-  path: "/login",
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
 const EditRoute = EditImport.update({
-  id: "/edit",
-  path: "/edit",
+  id: '/edit',
+  path: '/edit',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
 const CreateRoute = CreateImport.update({
-  id: "/create",
-  path: "/create",
+  id: '/create',
+  path: '/create',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
 const IndexRoute = IndexImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
 const EntriesIndexRoute = EntriesIndexImport.update({
-  id: "/entries/",
-  path: "/entries/",
+  id: '/entries/',
+  path: '/entries/',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
+
+const InvitationTokenLazyRoute = InvitationTokenLazyImport.update({
+  id: '/invitation/$token',
+  path: '/invitation/$token',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() =>
+  import('./routes/invitation/$token.lazy').then((d) => d.Route),
+)
 
 const EntriesEntryIdRoute = EntriesEntryIdImport.update({
-  id: "/entries/$entryId",
-  path: "/entries/$entryId",
+  id: '/entries/$entryId',
+  path: '/entries/$entryId',
   getParentRoute: () => rootRoute,
-} as any);
+} as any)
 
 // Populate the FileRoutesByPath interface
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/": {
-      id: "/";
-      path: "/";
-      fullPath: "/";
-      preLoaderRoute: typeof IndexImport;
-      parentRoute: typeof rootRoute;
-    };
-    "/create": {
-      id: "/create";
-      path: "/create";
-      fullPath: "/create";
-      preLoaderRoute: typeof CreateImport;
-      parentRoute: typeof rootRoute;
-    };
-    "/edit": {
-      id: "/edit";
-      path: "/edit";
-      fullPath: "/edit";
-      preLoaderRoute: typeof EditImport;
-      parentRoute: typeof rootRoute;
-    };
-    "/login": {
-      id: "/login";
-      path: "/login";
-      fullPath: "/login";
-      preLoaderRoute: typeof LoginImport;
-      parentRoute: typeof rootRoute;
-    };
-    "/settings": {
-      id: "/settings";
-      path: "/settings";
-      fullPath: "/settings";
-      preLoaderRoute: typeof SettingsImport;
-      parentRoute: typeof rootRoute;
-    };
-    "/entries/$entryId": {
-      id: "/entries/$entryId";
-      path: "/entries/$entryId";
-      fullPath: "/entries/$entryId";
-      preLoaderRoute: typeof EntriesEntryIdImport;
-      parentRoute: typeof rootRoute;
-    };
-    "/entries/": {
-      id: "/entries/";
-      path: "/entries";
-      fullPath: "/entries";
-      preLoaderRoute: typeof EntriesIndexImport;
-      parentRoute: typeof rootRoute;
-    };
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/create': {
+      id: '/create'
+      path: '/create'
+      fullPath: '/create'
+      preLoaderRoute: typeof CreateImport
+      parentRoute: typeof rootRoute
+    }
+    '/edit': {
+      id: '/edit'
+      path: '/edit'
+      fullPath: '/edit'
+      preLoaderRoute: typeof EditImport
+      parentRoute: typeof rootRoute
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginImport
+      parentRoute: typeof rootRoute
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterImport
+      parentRoute: typeof rootRoute
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsImport
+      parentRoute: typeof rootRoute
+    }
+    '/entries/$entryId': {
+      id: '/entries/$entryId'
+      path: '/entries/$entryId'
+      fullPath: '/entries/$entryId'
+      preLoaderRoute: typeof EntriesEntryIdImport
+      parentRoute: typeof rootRoute
+    }
+    '/invitation/$token': {
+      id: '/invitation/$token'
+      path: '/invitation/$token'
+      fullPath: '/invitation/$token'
+      preLoaderRoute: typeof InvitationTokenLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/entries/': {
+      id: '/entries/'
+      path: '/entries'
+      fullPath: '/entries'
+      preLoaderRoute: typeof EntriesIndexImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
 // Create and export the route tree
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute;
-  "/create": typeof CreateRoute;
-  "/edit": typeof EditRoute;
-  "/login": typeof LoginRoute;
-  "/settings": typeof SettingsRoute;
-  "/entries/$entryId": typeof EntriesEntryIdRoute;
-  "/entries": typeof EntriesIndexRoute;
+  '/': typeof IndexRoute
+  '/create': typeof CreateRoute
+  '/edit': typeof EditRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/settings': typeof SettingsRoute
+  '/entries/$entryId': typeof EntriesEntryIdRoute
+  '/invitation/$token': typeof InvitationTokenLazyRoute
+  '/entries': typeof EntriesIndexRoute
 }
 
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute;
-  "/create": typeof CreateRoute;
-  "/edit": typeof EditRoute;
-  "/login": typeof LoginRoute;
-  "/settings": typeof SettingsRoute;
-  "/entries/$entryId": typeof EntriesEntryIdRoute;
-  "/entries": typeof EntriesIndexRoute;
+  '/': typeof IndexRoute
+  '/create': typeof CreateRoute
+  '/edit': typeof EditRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/settings': typeof SettingsRoute
+  '/entries/$entryId': typeof EntriesEntryIdRoute
+  '/invitation/$token': typeof InvitationTokenLazyRoute
+  '/entries': typeof EntriesIndexRoute
 }
 
 export interface FileRoutesById {
-  __root__: typeof rootRoute;
-  "/": typeof IndexRoute;
-  "/create": typeof CreateRoute;
-  "/edit": typeof EditRoute;
-  "/login": typeof LoginRoute;
-  "/settings": typeof SettingsRoute;
-  "/entries/$entryId": typeof EntriesEntryIdRoute;
-  "/entries/": typeof EntriesIndexRoute;
+  __root__: typeof rootRoute
+  '/': typeof IndexRoute
+  '/create': typeof CreateRoute
+  '/edit': typeof EditRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/settings': typeof SettingsRoute
+  '/entries/$entryId': typeof EntriesEntryIdRoute
+  '/invitation/$token': typeof InvitationTokenLazyRoute
+  '/entries/': typeof EntriesIndexRoute
 }
 
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
+  fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | "/"
-    | "/create"
-    | "/edit"
-    | "/login"
-    | "/settings"
-    | "/entries/$entryId"
-    | "/entries";
-  fileRoutesByTo: FileRoutesByTo;
+    | '/'
+    | '/create'
+    | '/edit'
+    | '/login'
+    | '/register'
+    | '/settings'
+    | '/entries/$entryId'
+    | '/invitation/$token'
+    | '/entries'
+  fileRoutesByTo: FileRoutesByTo
   to:
-    | "/"
-    | "/create"
-    | "/edit"
-    | "/login"
-    | "/settings"
-    | "/entries/$entryId"
-    | "/entries";
+    | '/'
+    | '/create'
+    | '/edit'
+    | '/login'
+    | '/register'
+    | '/settings'
+    | '/entries/$entryId'
+    | '/invitation/$token'
+    | '/entries'
   id:
-    | "__root__"
-    | "/"
-    | "/create"
-    | "/edit"
-    | "/login"
-    | "/settings"
-    | "/entries/$entryId"
-    | "/entries/";
-  fileRoutesById: FileRoutesById;
+    | '__root__'
+    | '/'
+    | '/create'
+    | '/edit'
+    | '/login'
+    | '/register'
+    | '/settings'
+    | '/entries/$entryId'
+    | '/invitation/$token'
+    | '/entries/'
+  fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
-  CreateRoute: typeof CreateRoute;
-  EditRoute: typeof EditRoute;
-  LoginRoute: typeof LoginRoute;
-  SettingsRoute: typeof SettingsRoute;
-  EntriesEntryIdRoute: typeof EntriesEntryIdRoute;
-  EntriesIndexRoute: typeof EntriesIndexRoute;
+  IndexRoute: typeof IndexRoute
+  CreateRoute: typeof CreateRoute
+  EditRoute: typeof EditRoute
+  LoginRoute: typeof LoginRoute
+  RegisterRoute: typeof RegisterRoute
+  SettingsRoute: typeof SettingsRoute
+  EntriesEntryIdRoute: typeof EntriesEntryIdRoute
+  InvitationTokenLazyRoute: typeof InvitationTokenLazyRoute
+  EntriesIndexRoute: typeof EntriesIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -198,14 +247,16 @@ const rootRouteChildren: RootRouteChildren = {
   CreateRoute: CreateRoute,
   EditRoute: EditRoute,
   LoginRoute: LoginRoute,
+  RegisterRoute: RegisterRoute,
   SettingsRoute: SettingsRoute,
   EntriesEntryIdRoute: EntriesEntryIdRoute,
+  InvitationTokenLazyRoute: InvitationTokenLazyRoute,
   EntriesIndexRoute: EntriesIndexRoute,
-};
+}
 
 export const routeTree = rootRoute
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()
 
 /* ROUTE_MANIFEST_START
 {
@@ -217,8 +268,10 @@ export const routeTree = rootRoute
         "/create",
         "/edit",
         "/login",
+        "/register",
         "/settings",
         "/entries/$entryId",
+        "/invitation/$token",
         "/entries/"
       ]
     },
@@ -234,11 +287,17 @@ export const routeTree = rootRoute
     "/login": {
       "filePath": "login.tsx"
     },
+    "/register": {
+      "filePath": "register.tsx"
+    },
     "/settings": {
       "filePath": "settings.tsx"
     },
     "/entries/$entryId": {
       "filePath": "entries/$entryId.tsx"
+    },
+    "/invitation/$token": {
+      "filePath": "invitation/$token.lazy.tsx"
     },
     "/entries/": {
       "filePath": "entries/index.tsx"
